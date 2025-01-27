@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import com.studica.frc.AHRS;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 public class SwerveDrive extends SubsystemBase {
   // Create MAXSwerveModules
@@ -48,13 +50,8 @@ public class SwerveDrive extends SubsystemBase {
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getAngle()),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      });
+      getRotation(),
+      getModulePositions());
 
   /** Creates a new DriveSubsystem. */
   public SwerveDrive() {
@@ -65,16 +62,19 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getAngle()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
-  }
+    m_odometry.update(getRotation(),getModulePositions());
 
+        SmartDashboard.putNumber("Gyro angle: ", m_gyro.getAngle()%360);
+        
+       
+  }
+  /**
+     * Returns the rotation of the robot reported by the gyroscope.
+     * @return The rotation of the robot.
+     */
+    public Rotation2d getRotation() {
+      return m_gyro.getRotation2d();
+  }
   /**
    * Returns the currently-estimated pose of the robot.
    *
@@ -85,19 +85,26 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
+     * Returns the positions of the swerve modules.
+     * @return The swerve module positions.
+     */
+    public SwerveModulePosition[] getModulePositions() {
+      return new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+      };
+  }
+  /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(m_gyro.getAngle()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        },
+        getRotation(),
+        getModulePositions(),
         pose);
   }
 
@@ -119,7 +126,7 @@ public class SwerveDrive extends SubsystemBase {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(m_gyro.getAngle()))
+                getRotation())
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -172,7 +179,7 @@ public class SwerveDrive extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
+    return (getRotation().getDegrees()) % 360;
   }
 
   /**
