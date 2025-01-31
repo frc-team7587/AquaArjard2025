@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -14,16 +16,14 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.swerve.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import java.util.List;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveDrive;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -84,7 +84,7 @@ public class RobotContainer {
         AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
         // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
+        .setKinematics(SwerveConstants.kDriveKinematics);
 
     // An example trajectory to follow. All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -103,7 +103,7 @@ public class RobotContainer {
     SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
         exampleTrajectory,
         m_robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
+        SwerveConstants.kDriveKinematics,
 
         // Position controllers
         new PIDController(AutoConstants.kPXController, 0, 0),
