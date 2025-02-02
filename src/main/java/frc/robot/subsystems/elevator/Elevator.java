@@ -10,6 +10,31 @@ public class Elevator extends SubsystemBase {
         this.elevator = elevator;
     }
 
+    public Command elevatorToL1OfTheReef() {
+        return run(
+            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL1InInches - ElevatorConstants.kHeightOfElevatorInInches));
+    }
+
+    public Command elevatorToL2OfTheReef() {
+        return run(
+            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL2InInches - ElevatorConstants.kHeightOfElevatorInInches));
+    }
+
+    public Command elevatorToL3OfTheReef() {
+        return run(
+            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL3InInches - ElevatorConstants.kHeightOfElevatorInInches));
+    }
+
+    public Command elevatorToL4OfTheReef() {
+        return run(
+            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL4InInches - ElevatorConstants.kHeightOfElevatorInInches));
+    }
+
+    public Command elevatorToBase() {
+        return run(
+            () -> elevator.setElevatorPosition(0));
+    }
+
     public Command elevatorUp() {
         return run(
             () -> elevator.setMotorSpeed(ElevatorConstants.kElevatorUpSpeed));
