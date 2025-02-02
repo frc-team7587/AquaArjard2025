@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
@@ -51,6 +52,23 @@ public final class Configs {
                     // longer route.
                     .positionWrappingEnabled(true)
                     .positionWrappingInputRange(0, turningFactor);
+        }
+    }
+    public static final class ElevatorConfig {
+        public static final SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig elevatorSoftLimit = new SoftLimitConfig();
+
+
+        static {
+            elevatorMotorConfig
+                    .idleMode(IdleMode.kBrake)
+            elevatorMotorConfig.encoder
+                    .positionConversionFactor(1.0)
+                    .velocityConversionFactor(1.0 / 60.0);
+            elevatorMotorConfig.closedLoop
+                    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                    .pid(0.04, 0, 0)
+                    .outputRange(-1, 1);
         }
     }
 }
