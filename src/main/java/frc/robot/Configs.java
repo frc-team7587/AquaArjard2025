@@ -6,6 +6,7 @@ import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.subsystems.Elevator.ElevatorConstants;
 
 public final class Configs {
     public static final class MAXSwerveModule {
@@ -57,18 +58,16 @@ public final class Configs {
     public static final class ElevatorConfig {
         public static final SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
         public static final SoftLimitConfig elevatorSoftLimit = new SoftLimitConfig();
-
+        //soft limit = closed loop
 
         static {
             elevatorMotorConfig
-                    .idleMode(IdleMode.kBrake)
-            elevatorMotorConfig.encoder
-                    .positionConversionFactor(1.0)
-                    .velocityConversionFactor(1.0 / 60.0);
+                    .idleMode(IdleMode.kBrake);
+            //elevatorMotorConfig.encoder       
             elevatorMotorConfig.closedLoop
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                    .pid(0.04, 0, 0)
-                    .outputRange(-1, 1);
+                    .pid(0, 0, 0)
+                    .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
         }
     }
 }
