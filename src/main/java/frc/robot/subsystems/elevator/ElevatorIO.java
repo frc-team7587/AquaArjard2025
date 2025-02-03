@@ -5,4 +5,6 @@ public interface ElevatorIO {
     public void stop();
     public void setElevatorPosition(double position);
     public double getElevatorPosition();
+    public double getElevatorVelocity();
+    public void resetElevatorPosition();
 }

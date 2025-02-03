@@ -1,67 +1,62 @@
 package frc.robot.subsystems.elevator;
 
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+
+import frc.robot.Configs;
 
 public class ElevatorSparkMax implements ElevatorIO {
-    SparkMax elevatorMotorLeader;
-    SparkMax elevatorMotorFollower;
-    SparkClosedLoopController closedLoopController;
+    SparkMax leftElevatorMotor;
+    SparkMax rightElevatorMotor;
+
+    private final RelativeEncoder leftElevatorMotorEncoder;
+    private final RelativeEncoder rightElevatorMotorEncoder;
 
     public ElevatorSparkMax() {
-        elevatorMotorLeader = new SparkMax(ElevatorConstants.kElevatorMotorLeaderID, MotorType.kBrushless);
-        elevatorMotorFollower = new SparkMax(ElevatorConstants.kElevatorMotorFollowerID, MotorType.kBrushless);
+        leftElevatorMotor = new SparkMax(ElevatorConstants.kElevatorMotorLeaderID, MotorType.kBrushless);
+        rightElevatorMotor = new SparkMax(ElevatorConstants.kElevatorMotorFollowerID, MotorType.kBrushless);
+
+        leftElevatorMotorEncoder = leftElevatorMotor.getEncoder();
+        rightElevatorMotorEncoder = rightElevatorMotor.getEncoder();
     
-        SparkMaxConfig leaderConfig = new SparkMaxConfig();
-        SparkMaxConfig followerConfig = new SparkMaxConfig();
-
-        leaderConfig
-            .smartCurrentLimit(50)
-            .idleMode(IdleMode.kBrake);
-        leaderConfig.encoder
-            .positionConversionFactor(1.0)
-            .velocityConversionFactor(1.0);
-
-        leaderConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(0.2, 0.001, 0.05);
-
-        followerConfig
-            .apply(leaderConfig)
-            .follow(elevatorMotorLeader);
-
-        elevatorMotorLeader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        elevatorMotorFollower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        closedLoopController = elevatorMotorLeader.getClosedLoopController();
+        leftElevatorMotor.configure(Configs.ElevatorConfig.elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightElevatorMotor.configure(Configs.ElevatorConfig.elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
     public void setMotorSpeed(double speed) {
-        elevatorMotorLeader.set(speed);
+        leftElevatorMotor.set(speed);
+        rightElevatorMotor.set(speed);
     }
 
     @Override
     public void stop() {
-        elevatorMotorLeader.set(0);
+        leftElevatorMotor.set(0);
+        rightElevatorMotor.set(0);
     }
 
     @Override
     public void setElevatorPosition(double position) {
-        closedLoopController.setReference(position, ControlType.kPosition);
+        leftElevatorMotorEncoder.setPosition(position);
+        rightElevatorMotorEncoder.setPosition(position);
     }
 
     @Override
     public double getElevatorPosition() {
-        return elevatorMotorLeader.getEncoder().getPosition();
+        return (leftElevatorMotor.getEncoder().getPosition() + rightElevatorMotor.getEncoder().getPosition()) / 2;
+    }
+
+    @Override
+    public double getElevatorVelocity() {
+        return (leftElevatorMotor.getEncoder().getVelocity() + rightElevatorMotor.getEncoder().getVelocity()) / 2;
+    }
+
+    @Override
+    public void resetElevatorPosition() {
+        leftElevatorMotorEncoder.setPosition(0);
+        rightElevatorMotorEncoder.setPosition(0);
     }
 }

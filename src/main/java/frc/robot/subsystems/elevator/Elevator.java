@@ -12,22 +12,22 @@ public class Elevator extends SubsystemBase {
 
     public Command elevatorToL1OfTheReef() {
         return run(
-            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL1InInches - ElevatorConstants.kHeightOfElevatorInInches));
+            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL1InRotations - ElevatorConstants.kHeightOfElevatorInRotations));
     }
 
     public Command elevatorToL2OfTheReef() {
         return run(
-            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL2InInches - ElevatorConstants.kHeightOfElevatorInInches));
+            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL2InRotations - ElevatorConstants.kHeightOfElevatorInRotations));
     }
 
     public Command elevatorToL3OfTheReef() {
         return run(
-            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL3InInches - ElevatorConstants.kHeightOfElevatorInInches));
+            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL3InRotations - ElevatorConstants.kHeightOfElevatorInRotations));
     }
 
     public Command elevatorToL4OfTheReef() {
         return run(
-            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL4InInches - ElevatorConstants.kHeightOfElevatorInInches));
+            () -> elevator.setElevatorPosition(ElevatorConstants.kHeightOfL4InRotations - ElevatorConstants.kHeightOfElevatorInRotations));
     }
 
     public Command elevatorToBase() {

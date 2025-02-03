@@ -1,10 +1,12 @@
 package frc.robot;
 
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 
 public final class Configs {
     public static final class MAXSwerveModule {
@@ -51,6 +53,22 @@ public final class Configs {
                     // longer route.
                     .positionWrappingEnabled(true)
                     .positionWrappingInputRange(0, turningFactor);
+        }
+    }
+
+    public static final class ElevatorConfig {
+        public static final SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig elevatorSoftLimit = new SoftLimitConfig();
+        //soft limit = closed loop
+
+        static {
+            elevatorMotorConfig
+                    .idleMode(IdleMode.kBrake);
+            //elevatorMotorConfig.encoder       
+            elevatorMotorConfig.closedLoop
+                    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                    .pid(0, 0, 0)
+                    .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
         }
     }
 }
