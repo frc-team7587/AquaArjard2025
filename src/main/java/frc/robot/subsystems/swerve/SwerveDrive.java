@@ -14,8 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import com.studica.frc.AHRS;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -63,8 +61,7 @@ public class SwerveDrive extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(getRotation(),getModulePositions());
-
-        SmartDashboard.putNumber("Gyro angle: ", m_gyro.getAngle()%360);
+    SmartDashboard.putNumber("Gyro angle: ", m_gyro.getAngle()%360);
         
        
   }
