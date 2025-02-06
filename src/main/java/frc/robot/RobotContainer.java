@@ -18,12 +18,13 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.Swerve.*;
+import frc.robot.subsystems.swerve.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import org.photonvision.PhotonCamera;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -36,7 +37,10 @@ public class RobotContainer {
   private final SwerveDrive m_robotDrive = new SwerveDrive();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+
+  // Not used, just to test the library.
+  private final PhotonCamera m_camera = new PhotonCamera("Kodak");
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
