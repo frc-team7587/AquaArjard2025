@@ -63,7 +63,9 @@ public final class Configs {
         static {
             elevatorMotorConfig
                     .idleMode(IdleMode.kBrake);
-            //elevatorMotorConfig.encoder       
+            //elevatorMotorConfig.encoder
+                
+                    
             elevatorMotorConfig.closedLoop
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                     .pid(0, 0, 0)
