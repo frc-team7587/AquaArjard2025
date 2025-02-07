@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,11 +20,13 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Swerve.*;
+import frc.robot.subsystems.Vision.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import edu.wpi.first.wpilibj.IterativeRobotBase;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -35,6 +38,11 @@ public class RobotContainer {
   // The robot's subsystems
   private final SwerveDrive m_robotDrive = new SwerveDrive();
 
+  // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
+  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
+
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
@@ -45,7 +53,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    // Configure default commands
+    /*/ Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
@@ -58,6 +66,7 @@ public class RobotContainer {
             m_robotDrive
         )
     );
+    */
   }
 
   /**
@@ -70,7 +79,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
- 
+    
   }
 
   /**
@@ -79,7 +88,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Create config for trajectory
+    /*/ Create config for trajectory
+
+
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -117,5 +128,41 @@ public class RobotContainer {
 
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+    */
+    return null;
   }
+  
+  public void autonomousPeriodic() {
+    driveWithJoystick(false);
+    m_robotDrive.updateOdometry();
+  }
+  
+  public void teleopInit() {
+  }
+
+  public void teleopPeriodic() {
+    driveWithJoystick(true);
+    LimelightHelpers.setCropWindow("limelight", -.5, .7, -1, .9);
+    
+  }
+
+  private void driveWithJoystick(boolean fieldRelative) {
+    // Get the x speed. We are inverting this because Xbox controllers return
+    // negative values when we push forward.
+    final var xSpeed = -m_xspeedLimiter.calculate(m_driverController.getLeftY()) * DriveConstants.kMaxSpeedMetersPerSecond;
+
+    // Get the y speed or sideways/strafe speed. We are inverting this because
+    // we want a positive value when we pull to the left. Xbox controllers
+    // return positive values when you pull to the right by default.
+    final var ySpeed = -m_yspeedLimiter.calculate(m_driverController.getLeftX()) * DriveConstants.kMaxSpeedMetersPerSecond;
+
+    // Get the rate of angular rotation. We are inverting this because we want a
+    // positive value when we pull to the left (remember, CCW is positive in
+    // mathematics). Xbox controllers return positive values when you pull to
+    // the right by default.
+    final var rot = -m_rotLimiter.calculate(m_driverController.getRightX()) * DriveConstants.kMaxAngularSpeed;
+
+    m_robotDrive.drive(xSpeed, ySpeed, rot, fieldRelative, Robot.getPeriod);
+  }
+    
 }
