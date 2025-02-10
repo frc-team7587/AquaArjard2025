@@ -18,12 +18,17 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.marquee.MarqueeMessage;
+import frc.robot.subsystems.marquee.MarqueeMessageBuilder;
+import frc.robot.subsystems.marquee.MarqueeSubsystem;
 import frc.robot.subsystems.swerve.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import java.util.ArrayList;
 import java.util.List;
+
 import org.photonvision.PhotonCamera;
 
 /*
@@ -33,6 +38,31 @@ import org.photonvision.PhotonCamera;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+  /**
+   * Messages to display on the marquee.
+   */
+  private static final ArrayList<MarqueeMessage> kMessagesToDisplay;
+
+  static {
+    kMessagesToDisplay = new ArrayList<>();
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+        "Metuchen Momentum", 15000)
+        .setForegroundGreen(63)
+        .setForegroundRed(63)
+        .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder("Off the wall!", 10000)
+          .setBackgroundRed(31)
+          .setForegroundGreen(63)
+          .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder("Green Alliance", 12000)
+        .setForegroundGreen(127)
+        .build());
+  }
+
   // The robot's subsystems
   private final SwerveDrive m_robotDrive = new SwerveDrive();
 
@@ -41,6 +71,8 @@ public class RobotContainer {
 
   // Not used, just to test the library.
   private final PhotonCamera m_camera = new PhotonCamera("Kodak");
+
+  private final MarqueeSubsystem m_MarqueeSubsystem;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -62,6 +94,9 @@ public class RobotContainer {
             m_robotDrive
         )
     );
+
+    m_MarqueeSubsystem = MarqueeSubsystem.usbConnection(
+        kMessagesToDisplay, 20);
   }
 
   /**
@@ -121,5 +156,11 @@ public class RobotContainer {
 
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+  }
+
+  private static List<MarqueeMessage> presetMessages() {
+    List<MarqueeMessage> messages = new ArrayList<>();
+    // TODO(emintz): populate the list.
+    return messages;
   }
 }
