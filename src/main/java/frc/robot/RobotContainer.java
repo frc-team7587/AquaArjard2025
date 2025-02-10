@@ -72,6 +72,9 @@ public class RobotContainer {
   // Not used, just to test the library.
   private final PhotonCamera m_camera = new PhotonCamera("Kodak");
 
+  /**
+   * Subsystem that manages the marquee.
+   */
   private final MarqueeSubsystem m_MarqueeSubsystem;
 
   /**
@@ -156,11 +159,5 @@ public class RobotContainer {
 
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
-  }
-
-  private static List<MarqueeMessage> presetMessages() {
-    List<MarqueeMessage> messages = new ArrayList<>();
-    // TODO(emintz): populate the list.
-    return messages;
   }
 }
