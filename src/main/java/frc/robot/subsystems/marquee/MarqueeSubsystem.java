@@ -1,10 +1,10 @@
 package frc.robot.subsystems.marquee;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.List;
 import org.metuchenmomentum.marquee.DisplayConnection;
 import org.metuchenmomentum.marquee.DisplayConnectionFactory;
 
-import java.util.List;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /*
  * Marquee management subsystem that repeatedly 
@@ -41,8 +41,12 @@ public final class MarqueeSubsystem extends SubsystemBase {
     public static MarqueeSubsystem usbConnection(
         List<MarqueeMessage> messages,
         int millisecondsPerTick) {
+            System.out.println("Connecting to the ESP32 via ttyUSBn.");
+            DisplayConnection marqueeConnection = DisplayConnectionFactory.usbConnection();
+            System.out.println(
+                "Created marquee connection type: " + marqueeConnection.getClass().getCanonicalName());
             return new MarqueeSubsystem(
-                DisplayConnectionFactory.usbConnection(),
+               marqueeConnection,
                 messages,
                 millisecondsPerTick);
         }

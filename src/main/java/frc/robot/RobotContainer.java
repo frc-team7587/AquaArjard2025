@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj.DataLogManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +82,10 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // Redirect console output to the log
+    DataLogManager.start();
+    DataLogManager.logConsoleOutput(true);
+
     // Configure the button bindings
     configureButtonBindings();
 
@@ -98,6 +103,7 @@ public class RobotContainer {
         )
     );
 
+    System.out.println("Creating the marquee subsystem.");
     m_MarqueeSubsystem = MarqueeSubsystem.usbConnection(
         kMessagesToDisplay, 20);
   }
