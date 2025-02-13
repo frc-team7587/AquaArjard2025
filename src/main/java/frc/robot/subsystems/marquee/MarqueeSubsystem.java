@@ -27,6 +27,7 @@ public final class MarqueeSubsystem extends SubsystemBase {
     private int mTimeDisplayedMS;
     private int mWhenToAdvanceMS;
     private int mMessageIndex;
+    private int mIterationCount;
 
     /**
      * Convenience factory method: creates a {@link MarqueeSubsystem}
@@ -69,6 +70,7 @@ public final class MarqueeSubsystem extends SubsystemBase {
         mTimeDisplayedMS = 0;
         mWhenToAdvanceMS = 0;
         mMessageIndex = 0;
+        mIterationCount = 0;
     }
 
     /**
@@ -79,11 +81,29 @@ public final class MarqueeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         mTimeDisplayedMS += mMillisecondsPerTick;
+        ++mIterationCount;
         if (mWhenToAdvanceMS <= mTimeDisplayedMS) {
+            System.out.println("Display expired at ");
+            System.out.print(mTimeDisplayedMS);
+            System.out.print(" milliseconds after ");
+            System.out.print(mIterationCount);
+            System.out.println(" iterations.");
+            mTimeDisplayedMS = 0;
+            mIterationCount = 0;
             if (mMessages.size() <= mMessageIndex) {
                 mMessageIndex = 0;
             }
-            showMessage(mMessages.get(mMessageIndex));
+            MarqueeMessage showMe = mMessages.get(mMessageIndex);
+            System.out.print("Showing message number ");
+            System.out.print(mMessageIndex);
+            System.out.print(", \"");
+            System.out.print(showMe.displayMessage().toString());
+            System.out.println("\"");
+            showMessage(showMe);
+            mWhenToAdvanceMS = showMe.durationMs();
+            System.out.print("Display duration: ");
+            System.out.println(mWhenToAdvanceMS);
+            ++mMessageIndex;
         }
     }
 
@@ -109,7 +129,7 @@ public final class MarqueeSubsystem extends SubsystemBase {
      */
     private void showMessage(MarqueeMessage message) {
         mTimeDisplayedMS = 0;
-        mTimeDisplayedMS = message.durationMs();
+        mWhenToAdvanceMS = message.durationMs();
         mDisplayConnection.send(message.displayMessage());
     }
 }

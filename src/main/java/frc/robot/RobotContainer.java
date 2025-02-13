@@ -4,33 +4,14 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.marquee.MarqueeMessage;
 import frc.robot.subsystems.marquee.MarqueeMessageBuilder;
 import frc.robot.subsystems.marquee.MarqueeSubsystem;
-import frc.robot.subsystems.swerve.*;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.DataLogManager;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.photonvision.PhotonCamera;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -49,29 +30,25 @@ public class RobotContainer {
     kMessagesToDisplay = new ArrayList<>();
     kMessagesToDisplay.add(
       new MarqueeMessageBuilder(
-        "Metuchen Momentum", 15000)
+          "Metuchen Momentum", 100000)
         .setForegroundGreen(63)
         .setForegroundRed(63)
+        .setDelay1(30)
         .build());
     kMessagesToDisplay.add(
-      new MarqueeMessageBuilder("Off the wall!", 10000)
-          .setBackgroundRed(31)
-          .setForegroundGreen(63)
-          .build());
+      new MarqueeMessageBuilder(
+          "Off the wall!", 1000000)
+        .setBackgroundRed(31)
+        .setForegroundGreen(63)
+        .setDelay1(30)
+        .build());
     kMessagesToDisplay.add(
-      new MarqueeMessageBuilder("Green Alliance", 12000)
+      new MarqueeMessageBuilder(
+          "Green Alliance", 100000)
         .setForegroundGreen(127)
+        .setDelay1(30)
         .build());
   }
-
-  // The robot's subsystems
-  private final SwerveDrive m_robotDrive = new SwerveDrive();
-
-  // The driver's controller
-  private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-
-  // Not used, just to test the library.
-  private final PhotonCamera m_camera = new PhotonCamera("Kodak");
 
   /**
    * Subsystem that manages the marquee.
@@ -86,26 +63,11 @@ public class RobotContainer {
     DataLogManager.start();
     DataLogManager.logConsoleOutput(true);
 
-    // Configure the button bindings
-    configureButtonBindings();
-
-    // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true),
-            m_robotDrive
-        )
-    );
 
     System.out.println("Creating the marquee subsystem.");
     m_MarqueeSubsystem = MarqueeSubsystem.usbConnection(
         kMessagesToDisplay, 20);
+    System.out.println("Marquee subsystem created");
   }
 
   /**
@@ -127,43 +89,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Create config for trajectory
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
-
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        config);
-
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
-
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        m_robotDrive::setModuleStates,
-        m_robotDrive);
-
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+   return null;
   }
 }

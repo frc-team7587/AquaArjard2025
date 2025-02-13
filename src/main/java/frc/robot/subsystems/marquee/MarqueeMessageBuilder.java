@@ -51,46 +51,49 @@ public class MarqueeMessageBuilder {
             .setText(mText)
             .setDelay1(mDelay1)
             .setDelay2(mDelay2);
-        return new MarqueeMessage(displayMessage, mDisplayTimeMS);
+        var marqueeMessage = new MarqueeMessage(displayMessage, mDisplayTimeMS);
+        System.out.print("Created message: ");
+        System.out.println(marqueeMessage.toString());
+        return marqueeMessage;
     }
 
-    public MarqueeMessageBuilder setBackgroundRed(int mBackgroundRed) {
-        this.mBackgroundRed = mBackgroundRed;
+    public MarqueeMessageBuilder setBackgroundRed(int backgroundRed) {
+        this.mBackgroundRed = backgroundRed;
         return this;
     }
 
-    public MarqueeMessageBuilder setBackgroundGreen(int mBackgroundGreen) {
-        this.mBackgroundGreen = mBackgroundGreen;
+    public MarqueeMessageBuilder setBackgroundGreen(int backgroundGreen) {
+        this.mBackgroundGreen = backgroundGreen;
         return this;
     }
 
-    public MarqueeMessageBuilder setBackgroundBlue(int mBackgroundBlue) {
-        this.mBackgroundBlue = mBackgroundBlue;
+    public MarqueeMessageBuilder setBackgroundBlue(int backgroundBlue) {
+        this.mBackgroundBlue = backgroundBlue;
         return this;
     }
 
-    public MarqueeMessageBuilder setForegroundRed(int mForegroundRed) {
-        this.mForegroundRed = mForegroundRed;
+    public MarqueeMessageBuilder setForegroundRed(int foregroundRed) {
+        this.mForegroundRed = foregroundRed;
         return this;
     }
 
-    public MarqueeMessageBuilder setForegroundGreen(int mForegroundGreen) {
-        this.mForegroundGreen = mForegroundGreen;
+    public MarqueeMessageBuilder setForegroundGreen(int foregroundGreen) {
+        this.mForegroundGreen = foregroundGreen;
         return this;
     }
 
-    public MarqueeMessageBuilder setForegroundBlue(int mForegroundBlue) {
-        this.mForegroundBlue = mForegroundBlue;
+    public MarqueeMessageBuilder setForegroundBlue(int foregroundBlue) {
+        this.mForegroundBlue = foregroundBlue;
         return this;
     }
 
-    public MarqueeMessageBuilder setDelay1(int mDelay1) {
-        this.mDelay1 = mDelay1;
+    public MarqueeMessageBuilder setDelay1(int delay1) {
+        this.mDelay1 = delay1;
         return this;
     }
 
-    public MarqueeMessageBuilder setDelay2(int mDelay2) {
-        this.mDelay2 = mDelay2;
+    public MarqueeMessageBuilder setDelay2(int delay2) {
+        this.mDelay2 = delay2;
         return this;
     }
 }
