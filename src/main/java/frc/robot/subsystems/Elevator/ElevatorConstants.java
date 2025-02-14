@@ -10,6 +10,12 @@ public class ElevatorConstants {
     public static final double kElevatorMaxHeight = 0.0;
     public static final double kElevatorMinHeight = 0.0;
 
+    public static final double kElevatorLevel0 = 0.0;
+    public static final double kElevatorLevel1 = 0.0;
+    public static final double kElevatorLevel2 = 0.0;
+    public static final double kElevatorLevel3 = 0.0;
+    public static final double kElevatorLevel4 = 0.0;
+
     public static final double kP = 0.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;

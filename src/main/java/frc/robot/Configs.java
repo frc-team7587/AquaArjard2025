@@ -7,6 +7,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
+import frc.robot.subsystems.Intake.IntakeConstants;
 
 public final class Configs {
     public static final class MAXSwerveModule {
@@ -68,6 +69,30 @@ public final class Configs {
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                     .pid(0, 0, 0)
                     .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
+        }
+    }
+    public static final class IntakeConfig{
+        public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig pivotSoftLimit = new SoftLimitConfig();
+
+        static{
+        intakeConfig
+                .idleMode(IdleMode.kBrake);
+        intakeConfig.closedLoop
+                .pid(0.03, 0, 0)
+                .velocityFF(1)
+                .outputRange(-1, 1);
+        pivotConfig
+                .idleMode(IdleMode.kBrake);
+        pivotConfig.closedLoop
+                .pid(0.03, 0.0, 0.0)
+                .outputRange(-1, 1);
+        pivotSoftLimit
+                .forwardSoftLimitEnabled(true)
+                .forwardSoftLimit((float)IntakeConstants.kIntakeUpPosition)
+                .reverseSoftLimitEnabled(true)
+                .reverseSoftLimit((float)IntakeConstants.kIntakeDownPosition);
         }
     }
 }
