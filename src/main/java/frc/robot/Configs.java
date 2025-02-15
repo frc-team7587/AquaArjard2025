@@ -6,8 +6,9 @@ import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeConstants;
+import frc.robot.subsystems.CoralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
-import frc.robot.subsystems.Intake.IntakeConstants;
 
 public final class Configs {
     public static final class MAXSwerveModule {
@@ -71,7 +72,7 @@ public final class Configs {
                     .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
         }
     }
-    public static final class IntakeConfig{
+    public static final class AlgaeIntakeConfig{
         public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
         public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
         public static final SoftLimitConfig pivotSoftLimit = new SoftLimitConfig();
@@ -79,20 +80,37 @@ public final class Configs {
         static{
         intakeConfig
                 .idleMode(IdleMode.kBrake);
-        intakeConfig.closedLoop
-                .pid(0.03, 0, 0)
-                .velocityFF(1)
-                .outputRange(-1, 1);
         pivotConfig
                 .idleMode(IdleMode.kBrake);
         pivotConfig.closedLoop
-                .pid(0.03, 0.0, 0.0)
-                .outputRange(-1, 1);
+                .pid(AlgaeIntakeConstants.kP, AlgaeIntakeConstants.kI, AlgaeIntakeConstants.kD)
+                .outputRange(AlgaeIntakeConstants.kMinOutput, AlgaeIntakeConstants.kMaxOutput);
         pivotSoftLimit
                 .forwardSoftLimitEnabled(true)
-                .forwardSoftLimit((float)IntakeConstants.kIntakeUpPosition)
+                .forwardSoftLimit((float)AlgaeIntakeConstants.kPivotMaxPosition)
                 .reverseSoftLimitEnabled(true)
-                .reverseSoftLimit((float)IntakeConstants.kIntakeDownPosition);
+                .reverseSoftLimit((float)AlgaeIntakeConstants.kPivotMinPosition);
+        }
+    }
+    public static final class CoralIntakeConfig{
+        public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig pivotSoftLimit = new SoftLimitConfig();
+
+        static{
+        pivotConfig
+                .idleMode(IdleMode.kBrake);
+        pivotConfig.closedLoop
+                .pid(CoralIntakeConstants.kP, CoralIntakeConstants.kI, CoralIntakeConstants.kD)
+                .velocityFF(CoralIntakeConstants.kFF)
+                .outputRange(CoralIntakeConstants.kMinOutput, CoralIntakeConstants.kMaxOutput);
+        pivotSoftLimit
+                .forwardSoftLimitEnabled(true)
+                .forwardSoftLimit((float)CoralIntakeConstants.kPivotMaxPosition)
+                .reverseSoftLimitEnabled(true)
+                .reverseSoftLimit((float)CoralIntakeConstants.kPivotMinPosition);
+        intakeConfig
+                .idleMode(IdleMode.kBrake);
         }
     }
 }

@@ -4,8 +4,8 @@ public class ElevatorConstants {
     public static final double kElevatorUpSpeed = 0.65;
     public static final double kElevatorDownSpeed = -0.65;
 
-    public static final int kElevatorLeftMotorID = 8;
-    public static final int kElevatorRightMotorID = 9;
+    public static final int kElevatorLeftMotorID = 10;
+    public static final int kElevatorRightMotorID = 11;
 
     public static final double kElevatorMaxHeight = 0.0;
     public static final double kElevatorMinHeight = 0.0;

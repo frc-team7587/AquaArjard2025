@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.AlgaeIntake;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -8,23 +8,23 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
-import frc.robot.Configs.IntakeConfig;
+import frc.robot.Configs.AlgaeIntakeConfig;
 
-public class IntakeSparkMax implements IntakeIO{
+public class AlgaeIntakeSparkMax implements AlgaeIntakeIO{
     private final SparkMax pivotMotor;
     private final SparkMax intakeMotor;
 
     private final RelativeEncoder pivotEncoder;
     private final SparkClosedLoopController pivotController;
 
-    public IntakeSparkMax(){
-        pivotMotor = new SparkMax(1, MotorType.kBrushless);
-        intakeMotor = new SparkMax(2,MotorType.kBrushless);
+    public AlgaeIntakeSparkMax(){
+        pivotMotor = new SparkMax(AlgaeIntakeConstants.kPivotMotorID, MotorType.kBrushless);
+        intakeMotor = new SparkMax(AlgaeIntakeConstants.kIntakeMotorID ,MotorType.kBrushless);
 
         pivotEncoder = pivotMotor.getEncoder();
         pivotController = pivotMotor.getClosedLoopController();
-        pivotMotor.configure(IntakeConfig.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        intakeMotor.configure(IntakeConfig.intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        pivotMotor.configure(AlgaeIntakeConfig.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakeMotor.configure(AlgaeIntakeConfig.intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     }
     @Override
