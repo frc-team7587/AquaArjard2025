@@ -6,6 +6,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 
 public final class Configs {
@@ -71,4 +72,29 @@ public final class Configs {
                     .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
         }
     }
+
+    public static final class AlgaeIntakeConfigs {
+        public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig pivotSoftLimit = new SoftLimitConfig();
+
+        static{
+        intakeConfig
+                .idleMode(IdleMode.kBrake);
+        intakeConfig.closedLoop
+                .pid(0.03, 0, 0)
+                .velocityFF(1)
+                .outputRange(-1, 1);
+        pivotConfig
+                .idleMode(IdleMode.kBrake);
+        pivotConfig.closedLoop
+                .pid(0.03, 0.0, 0.0)
+                .outputRange(-1, 1);
+        pivotSoftLimit
+                .forwardSoftLimitEnabled(true)
+                .forwardSoftLimit((float)AlgaeIntakeConstants.kIntakeUpPosition)
+                .reverseSoftLimitEnabled(true)
+                .reverseSoftLimit((float)AlgaeIntakeConstants.kIntakeDownPosition);
+        }
+        }
 }

@@ -1,15 +1,15 @@
-package frc.robot.subsystems.coral;
+package frc.robot.subsystems.coralIntake;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
-public class CoralSparkMax implements CoralIO {
+public class CoralIntakeSparkMax implements CoralIntakeIO {
     SparkMax coralIndexMotor;
     SparkMax coralPivotMotor;
 
-    public CoralSparkMax() {
-        coralIndexMotor = new SparkMax(CoralConstants.kCoralIndexerMotorID, MotorType.kBrushless);
-        coralPivotMotor = new SparkMax(CoralConstants.kCoralPivotMotorID, MotorType.kBrushless);
+    public CoralIntakeSparkMax() {
+        coralIndexMotor = new SparkMax(CoralIntakeConstants.kCoralIndexerMotorID, MotorType.kBrushless);
+        coralPivotMotor = new SparkMax(CoralIntakeConstants.kCoralPivotMotorID, MotorType.kBrushless);
     }
 
     @Override

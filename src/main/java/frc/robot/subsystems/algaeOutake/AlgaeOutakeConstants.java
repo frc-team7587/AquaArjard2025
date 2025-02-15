@@ -1,6 +1,6 @@
-package frc.robot.subsystems.algae;
+package frc.robot.subsystems.algaeOutake;
 
-public class AlgaeConstants {
+public class AlgaeOutakeConstants {
     public static final int kAlgaeMotorLeaderID = 10;
     public static final int kAlgaeMotorFollowerID = 14;
 
