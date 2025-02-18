@@ -1,8 +1,8 @@
 package frc.robot.subsystems.Elevator;
 
 public class ElevatorConstants {
-    public static final double kElevatorUpSpeed = 0.65;
-    public static final double kElevatorDownSpeed = -0.65;
+    public static final double kElevatorUpSpeed = 0.1;
+    public static final double kElevatorDownSpeed = -0.1;
 
     public static final int kElevatorLeftMotorID = 10;
     public static final int kElevatorRightMotorID = 11;

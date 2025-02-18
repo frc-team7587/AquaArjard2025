@@ -48,15 +48,17 @@ public class Elevator extends SubsystemBase {
 
   // Moves the elevator up at the specified speed
   public Command elevatorUp() {
-    return run(
-      () -> elevator.elevatorUp(ElevatorConstants.kElevatorUpSpeed)
+    return startEnd(
+      () -> elevator.elevatorUp(ElevatorConstants.kElevatorUpSpeed),
+      () -> elevator.elevatorStop()
     );
   }
 
   // Moves the elevator down at the specified speed
   public Command elevatorDown() {
-    return run(
-      () -> elevator.elevatorDown(ElevatorConstants.kElevatorDownSpeed)
+    return startEnd(
+      () -> elevator.elevatorDown(ElevatorConstants.kElevatorDownSpeed),
+      () -> elevator.elevatorStop()
     );
   }
 

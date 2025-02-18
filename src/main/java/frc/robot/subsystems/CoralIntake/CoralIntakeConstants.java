@@ -1,9 +1,9 @@
 package frc.robot.subsystems.CoralIntake;
 
 public class CoralIntakeConstants {
-    public static final double kIntakeOutSpeed= -0.5;
-    public static final double kIntakeInSpeed = 0.5;
-    public static final double kPivotSpeed = 0.5;
+    public static final double kIntakeOutSpeed= -0.1;
+    public static final double kIntakeInSpeed = 0.1;
+    public static final double kPivotSpeed = 0.1;
 
     public static final int kIntakeMotorID = 15;
     public static final int kPivotMotorID = 14;

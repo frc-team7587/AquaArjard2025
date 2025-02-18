@@ -16,10 +16,10 @@ public class ElevatorModule implements ElevatorIO {
     private final RelativeEncoder leftElevatorMotorEncoder;
     private final RelativeEncoder rightElevatorMotorEncoder;
 
-    public ElevatorModule(int leftElevatorMotorID, int rightElevatorMotorID) {
+    public ElevatorModule() {
 
-        leftElevatorMotor = new SparkMax(leftElevatorMotorID, MotorType.kBrushless);
-        rightElevatorMotor = new SparkMax(rightElevatorMotorID, MotorType.kBrushless);
+        leftElevatorMotor = new SparkMax(ElevatorConstants.kElevatorLeftMotorID, MotorType.kBrushless);
+        rightElevatorMotor = new SparkMax(ElevatorConstants.kElevatorRightMotorID, MotorType.kBrushless);
 
         leftElevatorMotorEncoder = leftElevatorMotor.getEncoder();
         rightElevatorMotorEncoder = rightElevatorMotor.getEncoder();
