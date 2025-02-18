@@ -25,7 +25,7 @@ import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorModule;
 import frc.robot.subsystems.Vision.LimelightHelpers;
-import frc.robot.subsystems.swerve.*;
+//import frc.robot.subsystems.swerve.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -42,7 +42,7 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final SwerveDrive m_robotDrive = new SwerveDrive();
+ // private final SwerveDrive m_robotDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
   private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
 
@@ -63,7 +63,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     
-    m_robotDrive.setDefaultCommand(
+   /*  m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
@@ -75,10 +75,11 @@ public class RobotContainer {
             m_robotDrive
         )
     );
+    */
     //when y is pressed, elevator goes up
-    m_driverController.y().toggleOnTrue(m_elevator.elevatorUp());
+    m_driverController.y().whileTrue(m_elevator.elevatorUp());
     //when a is pressed, elevator goes down
-    m_driverController.a().toggleOnFalse(m_elevator.elevatorDown());
+    m_driverController.a().whileTrue(m_elevator.elevatorDown());
     
 
     
@@ -148,7 +149,7 @@ public class RobotContainer {
   }
   
   public void autonomousPeriodic() {
-    m_robotDrive.updateOdometry();
+   // m_robotDrive.updateOdometry();
   }
   
   public void teleopInit() {
