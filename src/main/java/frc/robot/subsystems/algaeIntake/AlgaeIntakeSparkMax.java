@@ -7,8 +7,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-
-import frc.robot.Configs.AlgaeIntakeConfigs;
+import frc.robot.Configs.AlgaeIntakeConfig;
 
 public class AlgaeIntakeSparkMax implements AlgaeIntakeIO {
     SparkMax algaePivot;
@@ -23,8 +22,8 @@ public class AlgaeIntakeSparkMax implements AlgaeIntakeIO {
     
         pivotEncoder = algaePivot.getEncoder();
         pivotController = algaeIntake.getClosedLoopController();
-        algaePivot.configure(AlgaeIntakeConfigs.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        algaeIntake.configure(AlgaeIntakeConfigs.intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        algaePivot.configure(AlgaeIntakeConfig.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        algaeIntake.configure(AlgaeIntakeConfig.intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override

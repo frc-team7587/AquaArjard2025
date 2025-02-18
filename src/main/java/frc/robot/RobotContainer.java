@@ -22,8 +22,15 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.algaeIntake.AlgaeIntake;
+import frc.robot.subsystems.algaeIntake.AlgaeIntakeSparkMax;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberSparkMax;
+import frc.robot.subsystems.coralIntake.CoralIntake;
+import frc.robot.subsystems.coralIntake.CoralIntakeSparkMax;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.vision.Vision;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -34,6 +41,10 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 public class RobotContainer {
   // The robot's subsystems
   private final SwerveDrive m_robotDrive = new SwerveDrive();
+  private final AlgaeIntake m_algae = new AlgaeIntake(new AlgaeIntakeSparkMax());
+  private final Climber m_climber = new Climber(new ClimberSparkMax());
+  private final CoralIntake m_coral = new CoralIntake(new CoralIntakeSparkMax());
+  private final Vision m_vision = new Vision(OIConstants.kLimeLightName);
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -70,7 +81,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
- 
+
+    
   }
 
   /**

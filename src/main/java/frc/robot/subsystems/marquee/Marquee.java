@@ -1,0 +1,135 @@
+package frc.robot.subsystems.marquee;
+
+import java.util.List;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.marquee.marqueeLib.DisplayConnection;
+import frc.robot.subsystems.marquee.marqueeLib.DisplayConnectionFactory;
+
+/*
+ * Marquee management subsystem that repeatedly 
+ * displays a message sequence. Users can also
+ * break the predetermined display sequence to display
+ * game-related notifications.
+ * 
+ * Note: the design assumes that event handlers (i.e. 
+ * {@link #periodic}) and explicitly invoked methods like
+ * {@link #displayNotification} run on the same thread.
+ * If they run on different threads, synchronize both
+ * methods.
+ */
+public final class Marquee extends SubsystemBase {
+    
+    private final DisplayConnection mDisplayConnection;
+    private final List<MarqueeMessage> mMessages;
+    private final int mMillisecondsPerTick;
+
+    private int mTimeDisplayedMS;
+    private int mWhenToAdvanceMS;
+    private int mMessageIndex;
+    private int mIterationCount;
+
+    /**
+     * Convenience factory method: creates a {@link MarqueeSubsystem}
+     * communicates with the marquee via a serial USB serial
+     * connection.
+     * 
+     * @param messages sequence of messages to display
+     * @param millisecondsPerTick interval between {@link #periodic()}
+     *        invocations.
+     * @return the newly minted {@link MarqueeSubsystem}
+     */
+    public static Marquee usbConnection(
+        List<MarqueeMessage> messages,
+        int millisecondsPerTick) {
+            System.out.println("Connecting to the ESP32 via ttyUSBn.");
+            DisplayConnection marqueeConnection = DisplayConnectionFactory.usbConnection();
+            System.out.println(
+                "Created marquee connection type: " + marqueeConnection.getClass().getCanonicalName());
+            return new Marquee(
+               marqueeConnection,
+                messages,
+                millisecondsPerTick);
+        }
+
+    /**
+     * Constructor
+     * 
+     * @param displayConnection connection to the marquee
+     * @param messages sequence of messages to display
+     * @param millisecondsPerTick interval between {@link #periodic()}
+     *        invocations.
+     */
+    public Marquee(
+        DisplayConnection displayConnection,
+        List<MarqueeMessage> messages,
+        int millisecondsPerTick) {
+        mDisplayConnection = displayConnection;
+        mMillisecondsPerTick = millisecondsPerTick;
+        mMessages = messages;
+        mTimeDisplayedMS = 0;
+        mWhenToAdvanceMS = 0;
+        mMessageIndex = 0;
+        mIterationCount = 0;
+    }
+
+    /**
+     * Displays the next message in the list if the current message
+     * has expirec. If the message list has been exhausted, reset to its
+     * first entry.
+     */
+    @Override
+    public void periodic() {
+        mTimeDisplayedMS += mMillisecondsPerTick;
+        ++mIterationCount;
+        if (mWhenToAdvanceMS <= mTimeDisplayedMS) {
+            System.out.println("Display expired at ");
+            System.out.print(mTimeDisplayedMS);
+            System.out.print(" milliseconds after ");
+            System.out.print(mIterationCount);
+            System.out.println(" iterations.");
+            mTimeDisplayedMS = 0;
+            mIterationCount = 0;
+            if (mMessages.size() <= mMessageIndex) {
+                mMessageIndex = 0;
+            }
+            MarqueeMessage showMe = mMessages.get(mMessageIndex);
+            System.out.print("Showing message number ");
+            System.out.print(mMessageIndex);
+            System.out.print(", \"");
+            System.out.print(showMe.displayMessage().toString());
+            System.out.println("\"");
+            showMessage(showMe);
+            mWhenToAdvanceMS = showMe.durationMs();
+            System.out.print("Display duration: ");
+            System.out.println(mWhenToAdvanceMS);
+            ++mMessageIndex;
+        }
+    }
+
+    /**
+     * Preempt the currently displayed message with the provided
+     * notification. The display will advance normally when the
+     * provided message display expires.
+     * 
+     * Invoke this method to display a game-related notification,
+     * e.g. "OUCH OUCH OUCH!" when the robot is bumped.
+     * 
+     * @param notification the notification to display.
+     */
+    public void displayNotification(MarqueeMessage notification) {
+        showMessage(notification);
+    }
+
+    /**
+     * Sends the provided message to the Marquee for display, and
+     * set its expiration time.
+     * 
+     * @param message the message to display.
+     */
+    private void showMessage(MarqueeMessage message) {
+        mTimeDisplayedMS = 0;
+        mWhenToAdvanceMS = message.durationMs();
+        mDisplayConnection.send(message.displayMessage());
+    }
+}

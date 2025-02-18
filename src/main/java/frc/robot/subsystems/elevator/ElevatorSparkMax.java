@@ -1,8 +1,10 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
@@ -15,13 +17,19 @@ public class ElevatorSparkMax implements ElevatorIO {
     private final RelativeEncoder leftElevatorMotorEncoder;
     private final RelativeEncoder rightElevatorMotorEncoder;
 
+    private final SparkClosedLoopController leftElevatorMotorController;
+    private final SparkClosedLoopController rightElevatorMotorController;
+
     public ElevatorSparkMax() {
         leftElevatorMotor = new SparkMax(ElevatorConstants.kElevatorMotorLeaderID, MotorType.kBrushless);
         rightElevatorMotor = new SparkMax(ElevatorConstants.kElevatorMotorFollowerID, MotorType.kBrushless);
 
         leftElevatorMotorEncoder = leftElevatorMotor.getEncoder();
         rightElevatorMotorEncoder = rightElevatorMotor.getEncoder();
-    
+
+        leftElevatorMotorController = leftElevatorMotor.getClosedLoopController();
+        rightElevatorMotorController = rightElevatorMotor.getClosedLoopController();
+
         leftElevatorMotor.configure(Configs.ElevatorConfig.elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightElevatorMotor.configure(Configs.ElevatorConfig.elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -40,8 +48,8 @@ public class ElevatorSparkMax implements ElevatorIO {
 
     @Override
     public void setElevatorPosition(double position) {
-        leftElevatorMotorEncoder.setPosition(position);
-        rightElevatorMotorEncoder.setPosition(position);
+        leftElevatorMotorController.setReference(position, ControlType.kPosition);
+        rightElevatorMotorController.setReference(position, ControlType.kPosition);
     }
 
     @Override
