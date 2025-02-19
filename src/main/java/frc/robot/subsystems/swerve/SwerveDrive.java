@@ -72,6 +72,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public SwerveDrive() {
+    m_gyro.reset();
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
   }

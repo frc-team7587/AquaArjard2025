@@ -10,8 +10,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  public static double getPeriod;
 
   private final RobotContainer m_robotContainer;
+  
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -54,7 +56,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    getPeriod = getPeriod();
+  }
 
   @Override
   public void teleopExit() {}

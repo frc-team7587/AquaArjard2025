@@ -11,17 +11,54 @@ public class Elevator extends SubsystemBase {
     this.elevator = elevator;
   }
 
+  //Moves the elevator up to Level 0
+  public Command elevatorToLevel0() {
+    return run(
+      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel0)
+    );
+  }
+
+  //Moves the elevator up to Level 1
+  public Command elevatorToLevel1() {
+    return run(
+      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel1)
+    );
+  }
+
+  //Moves the elevator up to Level 2
+  public Command elevatorToLevel2() {
+    return run(
+      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2)
+    );
+  }
+
+  //Moves the elevator up to Level 3
+  public Command elevatorToLevel3() {
+    return run(
+      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel3)
+    );
+  }
+
+  //Moves the elevator up to Level 4
+  public Command elevatorToLevel4() {
+    return run(
+      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel4)
+    );
+  }
+
   // Moves the elevator up at the specified speed
   public Command elevatorUp() {
-    return run(
-      () -> elevator.elevatorUp(ElevatorConstants.kElevatorUpSpeed)
+    return startEnd(
+      () -> elevator.elevatorUp(ElevatorConstants.kElevatorUpSpeed),
+      () -> elevator.elevatorStop()
     );
   }
 
   // Moves the elevator down at the specified speed
   public Command elevatorDown() {
-    return run(
-      () -> elevator.elevatorDown(ElevatorConstants.kElevatorDownSpeed)
+    return startEnd(
+      () -> elevator.elevatorDown(ElevatorConstants.kElevatorDownSpeed),
+      () -> elevator.elevatorStop()
     );
   }
 
