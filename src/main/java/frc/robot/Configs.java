@@ -68,7 +68,9 @@ public final class Configs {
             //elevatorMotorConfig.encoder       
             elevatorMotorConfig.closedLoop
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                    .pid(0, 0, 0);        }
+                    .pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD)  
+                    .velocityFF(ElevatorConstants.kFF);
+        }  
     }
     public static final class AlgaeIntakeConfig{
         public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();

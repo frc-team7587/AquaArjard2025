@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntake;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSparkMax;
 import frc.robot.subsystems.CoralIntake.CoralIntake;
 import frc.robot.subsystems.CoralIntake.CoralIntakeSparkMax;
 import frc.robot.subsystems.Elevator.Elevator;
@@ -45,6 +47,7 @@ public class RobotContainer {
  // private final SwerveDrive m_robotDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
   private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
+  private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
 
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
@@ -80,6 +83,14 @@ public class RobotContainer {
     m_driverController.y().whileTrue(m_elevator.elevatorUp());
     //when a is pressed, elevator goes down
     m_driverController.a().whileTrue(m_elevator.elevatorDown());
+    //when b is pressed, coral intake pivots up
+    m_driverController.b().whileTrue(m_coralIntake.turntoUp());
+    //when x is pressed, coral intake pivots down
+    m_driverController.x().whileTrue(m_coralIntake.turntoDown());
+    //when left dpad is pressed, algae ipivot goes down
+    m_driverController.povLeft().whileTrue(m_algaeIntake.turntoDown());
+    //when right dpad is pressed, algae pivot goes up
+    m_driverController.povRight().whileTrue(m_algaeIntake.turntoUp());
     
 
     

@@ -4,11 +4,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.CoralIntake.CoralIntakeConstants;
 
-public class AlageIntake extends SubsystemBase{
+public class AlgaeIntake extends SubsystemBase{
     private final AlgaeIntakeIO intake;
 
-    public AlageIntake(AlgaeIntakeIO intake){
+    public AlgaeIntake(AlgaeIntakeIO intake){
         this.intake = intake;
     }
 
@@ -33,13 +34,20 @@ public class AlageIntake extends SubsystemBase{
     }
 
     public Command turntoUp(){
-        return run(() -> intake.setPivotPosition(AlgaeIntakeConstants.kPivotMaxPosition));
+        return startEnd(
+            () -> intake.setPivotSpeed(AlgaeIntakeConstants.kPivotSpeedUp),
+            () -> intake.setIntakeSpeed(0)
+        );
+
     }
     public Command turntoNeutral(){
         return run(() -> intake.setPivotPosition(AlgaeIntakeConstants.kPivotNeutalPosition));
     }
     public Command turntoDown(){
-        return run(() -> intake.setPivotPosition(AlgaeIntakeConstants.kPivotMinPosition));
+        return startEnd(
+            () -> intake.setPivotSpeed(AlgaeIntakeConstants.kPivotSpeedDown),
+            () -> intake.setIntakeSpeed(0)
+        );
     }
     public Command intakeIn(){
         return run(() -> intake.setIntakeSpeed(AlgaeIntakeConstants.kIntakeInSpeed));

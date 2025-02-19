@@ -16,10 +16,10 @@ public class ElevatorConstants {
     public static final double kElevatorLevel3 = 0.0;
     public static final double kElevatorLevel4 = 0.0;
 
-    public static final double kP = 0.0;
+    public static final double kP = 0.025;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kFF = 0.0;
+    public static final double kFF = 0.000015;
     public static final double kMinOutput = -1.0;
     public static final double kMaxOutput = 1.0;
 }

@@ -27,13 +27,20 @@ public class CoralIntake extends SubsystemBase{
     }
 
     public Command turntoUp(){
-        return run(() -> intake.setPivotPosition(CoralIntakeConstants.kPivotMaxPosition));
+        return startEnd(
+            () -> intake.setPivotSpeed(CoralIntakeConstants.kPivotSpeedUp),
+            () -> intake.setIntakeSpeed(0)
+        );
+
     }
     public Command turntoNeutral(){
         return run(() -> intake.setPivotPosition(CoralIntakeConstants.kPivotNeutalPosition));
     }
     public Command turntoDown(){
-        return run(() -> intake.setPivotPosition(CoralIntakeConstants.kPivotMinPosition));
+        return startEnd(
+            () -> intake.setPivotSpeed(CoralIntakeConstants.kPivotSpeedDown),
+            () -> intake.setIntakeSpeed(0)
+        );
     }
     public Command intakeIn(){
         return run(() -> intake.setIntakeSpeed(CoralIntakeConstants.kIntakeInSpeed));
