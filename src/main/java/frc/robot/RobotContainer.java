@@ -19,11 +19,19 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.swerve.*;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntake;
+import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSparkMax;
+import frc.robot.subsystems.CoralIntake.CoralIntake;
+import frc.robot.subsystems.CoralIntake.CoralIntakeSparkMax;
+import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorConstants;
+import frc.robot.subsystems.Elevator.ElevatorModule;
 import frc.robot.subsystems.Vision.LimelightHelpers;
+//import frc.robot.subsystems.swerve.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
@@ -36,7 +44,11 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final SwerveDrive m_robotDrive = new SwerveDrive();
+ // private final SwerveDrive m_robotDrive = new SwerveDrive();
+  private final Elevator m_elevator = new Elevator(new ElevatorModule());
+  private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
+  private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
+
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
@@ -44,8 +56,8 @@ public class RobotContainer {
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -53,8 +65,8 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    /*/ Configure default commands
-    m_robotDrive.setDefaultCommand(
+    
+   /*  m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
@@ -62,11 +74,26 @@ public class RobotContainer {
                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true),
+                true, Robot.getPeriod),
             m_robotDrive
         )
     );
     */
+    //when y is pressed, elevator goes up
+    m_driverController.y().whileTrue(m_elevator.elevatorUp());
+    //when a is pressed, elevator goes down
+    m_driverController.a().whileTrue(m_elevator.elevatorDown());
+    //when b is pressed, coral intake pivots up
+    m_driverController.b().whileTrue(m_coralIntake.turntoUp());
+    //when x is pressed, coral intake pivots down
+    m_driverController.x().whileTrue(m_coralIntake.turntoDown());
+    //when left dpad is pressed, algae ipivot goes down
+    m_driverController.povLeft().whileTrue(m_algaeIntake.turntoDown());
+    //when right dpad is pressed, algae pivot goes up
+    m_driverController.povRight().whileTrue(m_algaeIntake.turntoUp());
+    
+
+    
   }
 
   /**
@@ -133,7 +160,7 @@ public class RobotContainer {
   }
   
   public void autonomousPeriodic() {
-    m_robotDrive.updateOdometry();
+   // m_robotDrive.updateOdometry();
   }
   
   public void teleopInit() {
