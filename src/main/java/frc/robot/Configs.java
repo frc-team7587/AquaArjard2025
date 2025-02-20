@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -58,20 +59,23 @@ public final class Configs {
         }
     }
     public static final class ElevatorConfig {
-        public static final SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig leftMotorConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig rightMotorConfig = new SparkMaxConfig();
         public static final SoftLimitConfig elevatorSoftLimit = new SoftLimitConfig();
-        //soft limit = closed loop
 
         static {
-            elevatorMotorConfig
-                    .idleMode(IdleMode.kBrake);
-            //elevatorMotorConfig.encoder
-                
-                    
-            elevatorMotorConfig.closedLoop
-                    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                    .pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD)  
-                    .velocityFF(ElevatorConstants.kFF);
+            leftMotorConfig
+                    //.smartCurrentLimit(0);
+                    .idleMode(IdleMode.kBrake)
+                    .voltageCompensation(12.0);
+            leftMotorConfig.closedLoop.pidf(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD, 0);
+            leftMotorConfig.closedLoop.maxMotion
+                    .maxVelocity(ElevatorConstants.kMaxVelocity)
+                    .maxAcceleration(ElevatorConstants.kMaxAcceleration);
+            rightMotorConfig
+                    .apply(leftMotorConfig)
+                    .follow(ElevatorConstants.kElevatorLeftMotorID, false);
+        
         }  
     }
     public static final class AlgaeIntakeConfig{
