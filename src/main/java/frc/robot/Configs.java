@@ -7,7 +7,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
+import frc.robot.subsystems.algaeOuttake.AlgaeOuttakeConstants;
 import frc.robot.subsystems.climber.ClimberConstants;
+import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
+import frc.robot.subsystems.coralOuttake.CoralOuttakeConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 
 public final class Configs {
@@ -79,14 +82,14 @@ public final class Configs {
     }
 
     public static final class AlgaeIntakeConfig {
-        public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig indexerConfig = new SparkMaxConfig();
         public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
         public static final SoftLimitConfig pivotSoftLimit = new SoftLimitConfig();
 
         static{
-                intakeConfig
+                indexerConfig
                         .idleMode(IdleMode.kBrake);
-                intakeConfig.closedLoop
+                indexerConfig.closedLoop
                         .pid(0.03, 0, 0)
                         .velocityFF(1)
                         .outputRange(-1, 1);
@@ -100,6 +103,81 @@ public final class Configs {
                         .forwardSoftLimit((float)AlgaeIntakeConstants.kIntakeUpPosition)
                         .reverseSoftLimitEnabled(true)
                         .reverseSoftLimit((float)AlgaeIntakeConstants.kIntakeDownPosition);
+        }
+    }
+
+    public static final class AlgaeOuttakeConfig {
+        public static final SparkMaxConfig indexerConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig pivotSoftLimit = new SoftLimitConfig();
+
+        static{
+                indexerConfig
+                        .idleMode(IdleMode.kBrake);
+                indexerConfig.closedLoop
+                        .pid(0.03, 0, 0)
+                        .velocityFF(1)
+                        .outputRange(-1, 1);
+                pivotConfig
+                        .idleMode(IdleMode.kBrake);
+                pivotConfig.closedLoop
+                        .pid(0.03, 0.0, 0.0)
+                        .outputRange(-1, 1);
+                pivotSoftLimit
+                        .forwardSoftLimitEnabled(true)
+                        .forwardSoftLimit((float)AlgaeOuttakeConstants.kOutakeUpPosition)
+                        .reverseSoftLimitEnabled(true)
+                        .reverseSoftLimit((float)AlgaeOuttakeConstants.kOutakeDownPosition);
+        }
+    }
+
+    public static final class CoralIntakeConfig {
+        public static final SparkMaxConfig indexerConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig pivotSoftLimit = new SoftLimitConfig();
+
+        static{
+                indexerConfig
+                        .idleMode(IdleMode.kBrake);
+                indexerConfig.closedLoop
+                        .pid(0.03, 0, 0)
+                        .velocityFF(1)
+                        .outputRange(-1, 1);
+                pivotConfig
+                        .idleMode(IdleMode.kBrake);
+                pivotConfig.closedLoop
+                        .pid(0.03, 0.0, 0.0)
+                        .outputRange(-1, 1);
+                pivotSoftLimit
+                        .forwardSoftLimitEnabled(true)
+                        .forwardSoftLimit((float)CoralIntakeConstants.kIntakeUpPosition)
+                        .reverseSoftLimitEnabled(true)
+                        .reverseSoftLimit((float)CoralIntakeConstants.kIntakeDownPosition);
+        }
+    }
+
+    public static final class CoralOuttakeConfig {
+        public static final SparkMaxConfig indexerConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig pivotConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig pivotSoftLimit = new SoftLimitConfig();
+
+        static{
+                indexerConfig
+                        .idleMode(IdleMode.kBrake);
+                indexerConfig.closedLoop
+                        .pid(0.03, 0, 0)
+                        .velocityFF(1)
+                        .outputRange(-1, 1);
+                pivotConfig
+                        .idleMode(IdleMode.kBrake);
+                pivotConfig.closedLoop
+                        .pid(0.03, 0.0, 0.0)
+                        .outputRange(-1, 1);
+                pivotSoftLimit
+                        .forwardSoftLimitEnabled(true)
+                        .forwardSoftLimit((float)CoralOuttakeConstants.kOuttakeUpPosition)
+                        .reverseSoftLimitEnabled(true)
+                        .reverseSoftLimit((float)CoralOuttakeConstants.kOuttakeDownPosition);
         }
     }
 

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.coralIntake;
+package frc.robot.subsystems.coralOuttake;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -11,8 +11,9 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Configs.AlgaeIntakeConfig;
 import frc.robot.subsystems.algaeIntake.AlgaeIntakeConstants;
+import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 
-public class CoralIntakeSparkMax implements CoralIntakeIO {
+public class CoralOuttakeSparkMax implements CoralOuttakeIO {
     SparkMax coralIndexMotor;
     SparkMax coralPivotMotor;
 
@@ -21,7 +22,7 @@ public class CoralIntakeSparkMax implements CoralIntakeIO {
 
     private final DigitalInput breakBeamSensor;
 
-    public CoralIntakeSparkMax() {
+    public CoralOuttakeSparkMax() {
         coralPivotMotor = new SparkMax(AlgaeIntakeConstants.kAlgaeMotorLeaderID, MotorType.kBrushless);
         coralIndexMotor = new SparkMax(AlgaeIntakeConstants.kAlgaeMotorFollowerID, MotorType.kBrushless);
     

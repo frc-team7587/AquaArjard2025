@@ -1,7 +1,7 @@
-package frc.robot.subsystems.algaeIntake;
+package frc.robot.subsystems.algaeOuttake;
 
-public interface AlgaeIntakeIO {
-    public void setIntakeSpeed(double speed);
+public interface AlgaeOuttakeIO {
+    public void setOuttakeSpeed(double speed);
     public void setPivotSpeed(double speed);
     public void setPivotPosition(double position);
     public double getPivotPosition();

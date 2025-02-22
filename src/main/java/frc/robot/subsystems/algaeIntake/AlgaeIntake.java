@@ -26,12 +26,6 @@ public class AlgaeIntake extends SubsystemBase {
             () -> algaeIntake.setIntakeSpeed(0));
     }
 
-    public Command outtakeAlgae(){
-        return startEnd(
-            () -> algaeIntake.setIntakeSpeed(AlgaeIntakeConstants.kIntakeOutSpeed),
-            () -> algaeIntake.setIntakeSpeed(0));
-    }
-
     public Command turntoUp(){
         return run(() -> algaeIntake.setPivotPosition(AlgaeIntakeConstants.kIntakeUpPosition));
     }
