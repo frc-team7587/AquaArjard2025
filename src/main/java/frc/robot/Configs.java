@@ -125,9 +125,9 @@ public final class Configs {
                         .outputRange(-1, 1);
                 pivotSoftLimit
                         .forwardSoftLimitEnabled(true)
-                        .forwardSoftLimit((float)AlgaeOuttakeConstants.kOutakeUpPosition)
+                        .forwardSoftLimit((float)AlgaeOuttakeConstants.kOuttakeUpPosition)
                         .reverseSoftLimitEnabled(true)
-                        .reverseSoftLimit((float)AlgaeOuttakeConstants.kOutakeDownPosition);
+                        .reverseSoftLimit((float)AlgaeOuttakeConstants.kOuttakeDownPosition);
         }
     }
 

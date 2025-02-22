@@ -4,6 +4,15 @@
 
 package frc.robot.subsystems.swerve;
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.studica.frc.AHRS;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -19,11 +28,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.LimelightHelpers;
-import frc.robot.subsystems.vision.Vision;
-
 
 public class SwerveDrive extends SubsystemBase {
   // Create MAXSwerveModules
@@ -50,21 +59,58 @@ public class SwerveDrive extends SubsystemBase {
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
-  // The vision system
-  Vision vision = new Vision("limelight");
-
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
     SwerveConstants.kDriveKinematics,
       getRotation(),
       getModulePositions());
 
+  private Field2d field = new Field2d();
+
   /** Creates a new DriveSubsystem. */
   public SwerveDrive() {
-    // Usage reporting for MAXSwerve template
-    HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+    RobotConfig config;
+    try{
+      config = RobotConfig.fromGUISettings();
 
-    m_gyro.reset();
+      // Configure AutoBuilder last
+      AutoBuilder.configure(
+        this::getPose, // Robot pose supplier
+        this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+        this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+        new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+          new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+          new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+        ),
+        config, // The robot configuration
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this // Reference to this subsystem to set requirements
+      );
+
+      // Set up custom logging to add the current path to a field 2d widget
+      PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
+
+      SmartDashboard.putData("Field", field);
+
+      // Usage reporting for MAXSwerve template
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+
+      m_gyro.reset();
+    } catch (IOException | ParseException e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -80,8 +126,8 @@ public class SwerveDrive extends SubsystemBase {
      * Returns the rotation of the robot reported by the gyroscope.
      * @return The rotation of the robot.
      */
-    public Rotation2d getRotation() {
-      return m_gyro.getRotation2d();
+  public Rotation2d getRotation() {
+    return m_gyro.getRotation2d();
   }
   /**
    * Returns the currently-estimated pose of the robot.
@@ -90,6 +136,14 @@ public class SwerveDrive extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+
+  public void resetPose(Pose2d pose) {
+    m_odometry.resetPosition(m_gyro.getRotation2d(), getModulePositions(), pose);
+  }
+
+  public ChassisSpeeds getSpeeds() {
+    return SwerveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
   }
 
   /* Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings. The numbers used
@@ -112,13 +166,22 @@ public class SwerveDrive extends SubsystemBase {
      * Returns the positions of the swerve modules.
      * @return The swerve module positions.
      */
-    public SwerveModulePosition[] getModulePositions() {
-      return new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      };
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+    };
+  }
+
+  public SwerveModuleState[] getModuleStates() {
+    return new SwerveModuleState[] {
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState()
+    };
   }
   /**
    * Resets the odometry to the specified pose.
@@ -156,6 +219,17 @@ public class SwerveDrive extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
+  }
+
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    ChassisSpeeds discetSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+    SwerveModuleState[] moduleStates = SwerveConstants.kDriveKinematics.toSwerveModuleStates(discetSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, SwerveConstants.kMaxSpeedMetersPerSecond);
+
+    m_frontLeft.setDesiredState(moduleStates[0]);
+    m_frontRight.setDesiredState(moduleStates[1]);
+    m_rearLeft.setDesiredState(moduleStates[2]);
+    m_rearRight.setDesiredState(moduleStates[3]);
   }
 
   /**

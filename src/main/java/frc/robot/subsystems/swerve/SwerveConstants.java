@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -39,4 +41,7 @@ public class SwerveConstants {
     public static final int kRearRightTurningCanId = 6;
 
     public static final boolean kGyroReversed = false;
+
+    public static final PIDConstants translationConstants = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants rotationConstants = new PIDConstants(5.0, 0.0, 0.0);
 }
