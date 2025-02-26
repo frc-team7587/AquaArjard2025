@@ -27,7 +27,7 @@ import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorModule;
 import frc.robot.subsystems.Vision.LimelightHelpers;
-//import frc.robot.subsystems.swerve.*;
+import frc.robot.subsystems.swerve.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -44,7 +44,7 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  */
 public class RobotContainer {
   // The robot's subsystems
- // private final SwerveDrive m_robotDrive = new SwerveDrive();
+  private final SwerveDrive m_robotDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
   private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
@@ -66,7 +66,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     
-   /*  m_robotDrive.setDefaultCommand(
+    m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
@@ -78,19 +78,21 @@ public class RobotContainer {
             m_robotDrive
         )
     );
-    */
+    
     //when y is pressed, elevator goes up
-    m_driverController.y().whileTrue(m_elevator.elevatorUp());
+    m_driverController.y().whileTrue(m_elevator.elevatorToLevel2());
     //when a is pressed, elevator goes down
-    m_driverController.a().whileTrue(m_elevator.elevatorDown());
+    m_driverController.a().whileTrue(m_elevator.setElevatorPosition(0));
     //when b is pressed, coral intake pivots up
-    m_driverController.b().whileTrue(m_coralIntake.turntoUp());
-    //when x is pressed, coral intake pivots down
-    m_driverController.x().whileTrue(m_coralIntake.turntoDown());
+    //m_driverController.b().whileTrue(m_elevator.elevatorToLevel1());
+    m_driverController.x().whileTrue(m_coralIntake.turntoNeutral());
+    m_driverController.rightTrigger().whileTrue(m_algaeIntake.intakeAlgae());
+    m_driverController.leftTrigger().whileTrue(m_algaeIntake.outtakeAlgae());
     //when left dpad is pressed, algae ipivot goes down
-    m_driverController.povLeft().whileTrue(m_algaeIntake.turntoDown());
+    m_driverController.leftBumper().whileTrue(m_algaeIntake.turntoZero());
     //when right dpad is pressed, algae pivot goes up
-    m_driverController.povRight().whileTrue(m_algaeIntake.turntoUp());
+    m_driverController.rightBumper().whileTrue(m_algaeIntake.turntoNeutral());
+
     
 
     

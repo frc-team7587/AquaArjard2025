@@ -34,7 +34,7 @@ public interface ElevatorIO {
     /** 
      * Resets the encoder value of the elevator motors.
      */
-    public void resetElevatorPosition();
+    public void resetElevator();
 
 
 }

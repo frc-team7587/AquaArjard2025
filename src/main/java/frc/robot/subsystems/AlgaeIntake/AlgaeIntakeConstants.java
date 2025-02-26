@@ -1,8 +1,8 @@
 package frc.robot.subsystems.AlgaeIntake;
 
 public class AlgaeIntakeConstants {
-    public static final double kIntakeOutSpeed= -0.1;
-    public static final double kIntakeInSpeed = 0.1;
+    public static final double kIntakeOutSpeed= -0.5;
+    public static final double kIntakeInSpeed = 0.5;
     public static final double kPivotSpeedUp = 0.1;
     public static final double kPivotSpeedDown = -0.1;
 
@@ -10,10 +10,11 @@ public class AlgaeIntakeConstants {
     public static final int kPivotMotorID = 12;
 
     public static final double kPivotMaxPosition = 0.0;
-    public static final double kPivotNeutalPosition = 0.0;
-    public static final double kPivotMinPosition = 0.0;
+    public static final double kPivotNeutalPosition = -2.0;
+    public static final double kPivotZeroPosition = 0.0;
+    public static final double kPivotMinPosition = -7.0;
 
-    public static final double kP = 0.1;
+    public static final double kP = 0.07;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kFF = 0.00375;

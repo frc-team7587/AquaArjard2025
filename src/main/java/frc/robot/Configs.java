@@ -67,7 +67,8 @@ public final class Configs {
             leftMotorConfig
                     //.smartCurrentLimit(0);
                     .idleMode(IdleMode.kBrake)
-                    .voltageCompensation(12.0);
+                    .voltageCompensation(12.0)
+                    .inverted(false);
             leftMotorConfig.closedLoop.pidf(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD, 0);
             leftMotorConfig.closedLoop.maxMotion
                     .maxVelocity(ElevatorConstants.kMaxVelocity)
@@ -89,13 +90,15 @@ public final class Configs {
         pivotConfig
                 .idleMode(IdleMode.kBrake);
         pivotConfig.closedLoop
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .pid(AlgaeIntakeConstants.kP, AlgaeIntakeConstants.kI, AlgaeIntakeConstants.kD)
                 .outputRange(AlgaeIntakeConstants.kMinOutput, AlgaeIntakeConstants.kMaxOutput);
-        pivotSoftLimit
+        /*pivotSoftLimit
                 .forwardSoftLimitEnabled(true)
                 .forwardSoftLimit((float)AlgaeIntakeConstants.kPivotMaxPosition)
                 .reverseSoftLimitEnabled(true)
                 .reverseSoftLimit((float)AlgaeIntakeConstants.kPivotMinPosition);
+        */
         }
     }
     public static final class CoralIntakeConfig{

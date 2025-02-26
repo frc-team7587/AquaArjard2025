@@ -79,7 +79,7 @@ public class Elevator extends SubsystemBase {
   // Resets the elevator position to zero
   public Command resetElevatorPosition() {
     return run(
-      () -> elevator.resetElevatorPosition()
+      () -> elevator.setElevatorPosition(0)
     );
   }
   // Gets the current position of the elevator to put on SmartDashboard

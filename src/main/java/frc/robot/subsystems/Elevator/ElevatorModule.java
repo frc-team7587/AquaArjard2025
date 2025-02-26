@@ -10,7 +10,10 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -25,6 +28,10 @@ public class ElevatorModule implements ElevatorIO {
     private final SparkClosedLoopController leftElevatorMotorController;
     private final SparkClosedLoopController rightElevatorMotorController;
 
+    
+
+    private double setpoint =0;
+
     public ElevatorModule() {
 
         leftElevatorMotor = new SparkMax(ElevatorConstants.kElevatorLeftMotorID, MotorType.kBrushless);
@@ -36,14 +43,27 @@ public class ElevatorModule implements ElevatorIO {
         leftElevatorMotorController = leftElevatorMotor.getClosedLoopController();
         rightElevatorMotorController = rightElevatorMotor.getClosedLoopController();        
 
-        leftElevatorMotor.configure(Configs.ElevatorConfig.leftMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        rightElevatorMotor.configure(Configs.ElevatorConfig.rightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        SparkMaxConfig Lconfig = new SparkMaxConfig();
+        SparkMaxConfig Rconfig = new SparkMaxConfig();
+
+        Lconfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD)
+            .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
+        Rconfig
+            .apply(Lconfig)
+            .follow(10);
+
+        leftElevatorMotor.configure(Lconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightElevatorMotor.configure(Rconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
 
     }
 
     @Override
     public void elevatorUp(double speed) {
         leftElevatorMotor.set(speed);
+        
     }
 
     @Override
@@ -54,7 +74,12 @@ public class ElevatorModule implements ElevatorIO {
     @Override
     public void setElevatorPosition(double position) {
         leftElevatorMotorController.setReference(
-        position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, ElevatorConstants.kFF);
+        position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ElevatorConstants.kFF);
+        //position, ControlType.kPosition);
+    }
+    @Override
+    public void resetElevator(){
+        leftElevatorMotorEncoder.setPosition(0);
     }
 
     @Override
@@ -66,9 +91,6 @@ public class ElevatorModule implements ElevatorIO {
     public double getElevatorPosition() {
         return (leftElevatorMotorEncoder.getPosition() + rightElevatorMotorEncoder.getPosition()) / 2;
     }
-
-    @Override
-    public void resetElevatorPosition() {
-        leftElevatorMotorEncoder.setPosition(0);
-    }
 }
+
+
