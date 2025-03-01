@@ -79,12 +79,17 @@ public class Elevator extends SubsystemBase {
   // Resets the elevator position to zero
   public Command resetElevatorPosition() {
     return run(
-      () -> elevator.setElevatorPosition(0)
+      () -> elevator.setElevatorPosition(0.5)
     );
   }
   // Gets the current position of the elevator to put on SmartDashboard
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Elevator Position", elevator.getElevatorPosition());
+
+    SmartDashboard.putNumber("Left voltage", elevator.getLvoltage());
+    SmartDashboard.putNumber("Right voltage", elevator.getRvoltage());
+
+
   }
 }

@@ -45,6 +45,7 @@ public class CoralIntake extends SubsystemBase{
     public Command intakeIn(){
         return run(() -> intake.setIntakeSpeed(CoralIntakeConstants.kIntakeInSpeed));
     }
+
     public Command intakeOut(){
         return run(() -> intake.setIntakeSpeed(CoralIntakeConstants.kIntakeOutSpeed));
     }
@@ -53,6 +54,10 @@ public class CoralIntake extends SubsystemBase{
     }
     public Command stopIntake(){
         return run(() -> intake.setIntakeSpeed(0));
+    }
+
+    public Command setPivotPosition(double position){
+        return run(() -> intake.setPivotPosition(position));
     }
 
     @Override

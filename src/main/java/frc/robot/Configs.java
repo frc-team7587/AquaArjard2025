@@ -65,14 +65,11 @@ public final class Configs {
 
         static {
             leftMotorConfig
-                    //.smartCurrentLimit(0);
                     .idleMode(IdleMode.kBrake)
                     .voltageCompensation(12.0)
+                    .smartCurrentLimit(60)
                     .inverted(false);
-            leftMotorConfig.closedLoop.pidf(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD, 0);
-            leftMotorConfig.closedLoop.maxMotion
-                    .maxVelocity(ElevatorConstants.kMaxVelocity)
-                    .maxAcceleration(ElevatorConstants.kMaxAcceleration);
+            leftMotorConfig.closedLoop.pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
             rightMotorConfig
                     .apply(leftMotorConfig)
                     .follow(ElevatorConstants.kElevatorLeftMotorID, false);

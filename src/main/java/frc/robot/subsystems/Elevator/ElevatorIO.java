@@ -8,6 +8,7 @@ public interface ElevatorIO {
      */
     public void elevatorUp(double speed);
 
+
     /** 
      * Moves the elevator motors down.
      * @param speed The speed to set the motors to.
@@ -35,6 +36,8 @@ public interface ElevatorIO {
      * Resets the encoder value of the elevator motors.
      */
     public void resetElevator();
+    public double getLvoltage();
+    public double getRvoltage();
 
 
 }
