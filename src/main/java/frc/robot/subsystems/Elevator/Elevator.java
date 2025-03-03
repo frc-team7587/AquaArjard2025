@@ -39,13 +39,6 @@ public class Elevator extends SubsystemBase {
     );
   }
 
-  //Moves the elevator up to Level 4
-  public Command elevatorToLevel4() {
-    return run(
-      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel4)
-    );
-  }
-
   // Moves the elevator up at the specified speed
   public Command elevatorUp() {
     return startEnd(
