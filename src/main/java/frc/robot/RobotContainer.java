@@ -31,6 +31,7 @@ import frc.robot.subsystems.Vision.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -58,6 +59,8 @@ public class RobotContainer {
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  // The operator's controller
+  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -67,73 +70,65 @@ public class RobotContainer {
     configureButtonBindings();
 
     
-    // m_robotDrive.setDefaultCommand(
-    //      // The left stick controls translation of the robot.
-    //      // Turning is controlled by the X axis of the right stick.
-    //      new RunCommand(
-    //          () -> m_robotDrive.drive(
-    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-    //              -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
-    //              true, Robot.getPeriod),
-    //         m_robotDrive
-    //     )
-    // );
-    m_driverController.a().toggleOnTrue(m_elevator.elevatorToLevel0());
+    m_robotDrive.setDefaultCommand(
+         // The left stick controls translation of the robot.
+         // Turning is controlled by the X axis of the right stick.
+         new RunCommand(
+             () -> m_robotDrive.drive(
+                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                 -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                 true, Robot.getPeriod),
+            m_robotDrive
+        )
+    );
 
-    m_driverController.x().toggleOnTrue(m_elevator.elevatorToLevel1());
+    //sequantial command group for level 0 scoring, scores the corala and then brings elevator back to 0
+    SequentialCommandGroup L0 = new SequentialCommandGroup(
+      m_elevator.elevatorToLevel0(),
+      m_coralIntake.turntoNeutral(),
+      m_coralIntake.outtakeCoral().withTimeout(1.5),
+      m_elevator.resetElevatorPosition()
+    );
 
-    m_driverController.b().toggleOnTrue(m_elevator.elevatorToLevel2());
+    //sequantial command group for level 1 scoring, scores the corala and then brings elevator back to 0
+    SequentialCommandGroup L1 = new SequentialCommandGroup(
+      m_elevator.elevatorToLevel1(),
+      m_coralIntake.turntoNeutral(),
+      m_coralIntake.outtakeCoral().withTimeout(1.5),
+      m_elevator.resetElevatorPosition()
+    );
 
-    // m_driverController.x().toggleOnTrue(m_elevator.elevatorToLevel3().andThen(
-    //   m_coralIntake.setPivotPosition(2.5)
-    // ));
-    m_driverController.y().toggleOnTrue(m_elevator.elevatorToLevel3());
+    //sequantial command group for level 2 scoring, scores the corala and then brings elevator back to 0
+    SequentialCommandGroup L2 = new SequentialCommandGroup(
+      m_elevator.elevatorToLevel2(),
+      m_coralIntake.turntoNeutral(),
+      m_coralIntake.outtakeCoral().withTimeout(1.5),
+      m_elevator.resetElevatorPosition()
+    );
 
-    m_driverController.rightBumper().toggleOnTrue(m_coralIntake.setPivotPosition(2.4));
-    m_driverController.leftBumper().toggleOnTrue(m_coralIntake.turntoNeutral());
+    //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
+    SequentialCommandGroup L3 = new SequentialCommandGroup(
+      m_elevator.elevatorToLevel3(),
+      m_coralIntake.setPivotPosition(2.4),
+      m_coralIntake.outtakeCoral().withTimeout(1.5),
+      m_elevator.resetElevatorPosition()
+    );
+
+    //OPERATOR CONTROLS
+
+    //when bottom on Dpad is pressed, the level 0 sequence is run
+    m_operatorController.povDown().onTrue(L0);
+
+    //when left on Dpad is pressed, the level 1 sequence is run
+    m_operatorController.povLeft().onTrue(L1);
+
+    //when right on Dpad is pressed, the level 2 sequence is run
+    m_operatorController.povRight().onTrue(L2);
+
+    //when top on Dpad is pressed, the level 3 sequence is run
+    m_operatorController.povUp().onTrue(L3);
     
-
-  
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //when b is pressed, coral intake pivots up
-    //m_driverController.b().whileTrue(m_elevator.elevatorToLevel1());
-    m_driverController.x().whileTrue(m_coralIntake.turntoNeutral());
-   // m_driverController.rightTrigger().whileTrue(m_algaeIntake.intakeAlgae());
-    m_driverController.leftTrigger().whileTrue(m_coralIntake.intakeCoral());
-    m_driverController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
-    //when left dpad is pressed, algae ipivot goes down
-    //m_driverController.leftBumper().whileTrue(m_algaeIntake.turntoZero());
-    //when right dpad is pressed, algae pivot goes up
-    //m_driverController.rightBumper().whileTrue(m_algaeIntake.turntoNeutral());
-    
-    // m_driverController.povUp().toggleOnTrue(m_elevator.elevatorToLevel3());
-    // m_driverController.povDown().toggleOnTrue(m_elevator.resetElevatorPosition());
-    // //m_driverController.povLeft().whileTrue(m_elevator.elevatorToLevel1());
-    // m_driverController.povRight().toggleOnTrue(m_elevator.elevatorToLevel2());
-
     
   }
 
