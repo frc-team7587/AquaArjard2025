@@ -20,10 +20,10 @@ public class ElevatorConstants {
     public static final double kElevatorLevel2 = 13.3;
     public static final double kElevatorLevel3 = 29;
 
-    public static final double kP = 0.07;
+    public static final double kP = 0.05;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kFF = new ElevatorFeedforward(0.4,1.44,0.7,0.05).calculate(0);
+    public static final double kFF = new ElevatorFeedforward(0.1,1.44,0.6,0.05).calculate(0);
     public static final double kMinOutput = -1.0;
     public static final double kMaxOutput = 1.0;
 
