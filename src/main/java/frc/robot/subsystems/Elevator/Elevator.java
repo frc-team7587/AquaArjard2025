@@ -21,21 +21,21 @@ public class Elevator extends SubsystemBase {
   //Moves the elevator up to Level 1
   public Command elevatorToLevel1() {
     return run(
-      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel1)
+      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel1+1)
     );
   }
 
   //Moves the elevator up to Level 2
   public Command elevatorToLevel2() {
     return run(
-      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2)
+      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+1)
     );
   }
 
   //Moves the elevator up to Level 3
   public Command elevatorToLevel3() {
     return run(
-      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel3)
+      () -> elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel3+1)
     );
   }
 
@@ -72,7 +72,7 @@ public class Elevator extends SubsystemBase {
   // Resets the elevator position to zero
   public Command resetElevatorPosition() {
     return run(
-      () -> elevator.setElevatorPosition(0.5)
+      () -> elevator.setElevatorPosition(0)
     );
   }
   // Gets the current position of the elevator to put on SmartDashboard
