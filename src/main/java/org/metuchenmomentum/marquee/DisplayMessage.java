@@ -101,7 +101,7 @@ public final class DisplayMessage {
    }
  
    public DisplayMessage setText(String text) {
-    displayText = text;
+    displayText = text == null ? "" : text;
     return this;
    }
 

@@ -1,6 +1,9 @@
 package frc.robot.subsystems.marquee;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.metuchenmomentum.marquee.DisplayCommand;
 import org.metuchenmomentum.marquee.DisplayConnection;
 import org.metuchenmomentum.marquee.DisplayConnectionFactory;
 
@@ -20,10 +23,81 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public final class MarqueeSubsystem extends SubsystemBase {
     
+    private static final MarqueeMessage FILL_WITH_BLACK = new MarqueeMessageBuilder(null, 2000)
+    .setDisplayCommand(DisplayCommand.FILL_WITH_COLOR)
+    .build();
+
+    private static final List<MarqueeMessage> POWER_ON_MESSAGES;
+
+    /**
+     * Messages to display on startup. Note that the RoboRio needs time
+     * to connect with the ESP32, so we send a bunch of dummy commands
+     * that fill the screen with black before we send anything meaningful.
+     */
+    static {
+        POWER_ON_MESSAGES = new ArrayList<>();
+        POWER_ON_MESSAGES.add(FILL_WITH_BLACK);
+        // POWER_ON_MESSAGES.add(FILL_WITH_BLACK);
+        // POWER_ON_MESSAGES.add(FILL_WITH_BLACK);
+        // POWER_ON_MESSAGES.add(FILL_WITH_BLACK);
+        // POWER_ON_MESSAGES.add(FILL_WITH_BLACK);
+        // POWER_ON_MESSAGES.add(FILL_WITH_BLACK);
+        POWER_ON_MESSAGES.add(FILL_WITH_BLACK);
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder(null, 5000)
+            .setDisplayCommand(DisplayCommand.RIPPLING_RAINBOW)
+            .build());
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("Red", 1000)
+            .setBackgroundRed(63)
+            .setDisplayCommand(DisplayCommand.STATIC_TEXT)
+            .build());
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("Green", 1000)
+            .setBackgroundGreen(63)
+            .setDisplayCommand(DisplayCommand.STATIC_TEXT)
+            .build());
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("Blue", 1000)
+            .setBackgroundBlue(63)
+            .setDisplayCommand(DisplayCommand.STATIC_TEXT)
+            .build());
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("White", 1000)
+            .setBackgroundRed(21)
+            .setBackgroundGreen(21)
+            .setBackgroundBlue(21)
+            .setDisplayCommand(DisplayCommand.STATIC_TEXT)
+            .build());
+
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("Red", 1000)
+            .setForegroundRed(63)
+            .setDisplayCommand(DisplayCommand.STATIC_TEXT)
+            .build());
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("Green", 1000)
+            .setForegroundGreen(63)
+            .setDisplayCommand(DisplayCommand.STATIC_TEXT)
+            .build());
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("Blue", 1000)
+            .setForegroundBlue(63)
+            .setDisplayCommand(DisplayCommand.STATIC_TEXT)
+            .build());
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("White", 1000)
+            .setForegroundRed(21)
+            .setForegroundGreen(21)
+            .setForegroundBlue(21)
+            .setDisplayCommand(DisplayCommand.STATIC_TEXT)
+            .build());
+        
+        POWER_ON_MESSAGES.add(new MarqueeMessageBuilder("Starting ...", 5000)
+            .setForegroundRed(21)
+            .setForegroundGreen(21)
+            .setForegroundBlue(21)
+            .setDelay1(40)
+            .build());
+    }
+    
+
     private final DisplayConnection mDisplayConnection;
     private final List<MarqueeMessage> mMessages;
     private final int mMillisecondsPerTick;
 
+    private List<MarqueeMessage> mActiveMessages;
     private int mTimeDisplayedMS;
     private int mWhenToAdvanceMS;
     private int mMessageIndex;
@@ -64,13 +138,14 @@ public final class MarqueeSubsystem extends SubsystemBase {
         DisplayConnection displayConnection,
         List<MarqueeMessage> messages,
         int millisecondsPerTick) {
-        mDisplayConnection = displayConnection;
-        mMillisecondsPerTick = millisecondsPerTick;
-        mMessages = messages;
-        mTimeDisplayedMS = 0;
-        mWhenToAdvanceMS = 0;
-        mMessageIndex = 0;
-        mIterationCount = 0;
+            mDisplayConnection = displayConnection;
+            mMillisecondsPerTick = millisecondsPerTick;
+            mMessages = messages;
+            mActiveMessages = POWER_ON_MESSAGES;
+            mTimeDisplayedMS = 0;
+            mWhenToAdvanceMS = 0;
+            mMessageIndex = 0;
+            mIterationCount = 0;
     }
 
     /**
@@ -83,26 +158,27 @@ public final class MarqueeSubsystem extends SubsystemBase {
         mTimeDisplayedMS += mMillisecondsPerTick;
         ++mIterationCount;
         if (mWhenToAdvanceMS <= mTimeDisplayedMS) {
-            System.out.println("Display expired at ");
-            System.out.print(mTimeDisplayedMS);
-            System.out.print(" milliseconds after ");
-            System.out.print(mIterationCount);
-            System.out.println(" iterations.");
+            // System.out.println("Display expired at ");
+            // System.out.print(mTimeDisplayedMS);
+            // System.out.print(" milliseconds after ");
+            // System.out.print(mIterationCount);
+            // System.out.println(" iterations.");
             mTimeDisplayedMS = 0;
             mIterationCount = 0;
-            if (mMessages.size() <= mMessageIndex) {
+            if (mActiveMessages.size() <= mMessageIndex) {
                 mMessageIndex = 0;
+                mActiveMessages = mMessages;
             }
-            MarqueeMessage showMe = mMessages.get(mMessageIndex);
-            System.out.print("Showing message number ");
-            System.out.print(mMessageIndex);
-            System.out.print(", \"");
-            System.out.print(showMe.displayMessage().toString());
-            System.out.println("\"");
+            MarqueeMessage showMe = mActiveMessages.get(mMessageIndex);
+            // System.out.print("Showing message number ");
+            // System.out.print(mMessageIndex);
+            // System.out.print(", \"");
+            // System.out.print(showMe.displayMessage().toString());
+            // System.out.println("\"");
             showMessage(showMe);
             mWhenToAdvanceMS = showMe.durationMs();
-            System.out.print("Display duration: ");
-            System.out.println(mWhenToAdvanceMS);
+            // System.out.print("Display duration: ");
+            // System.out.println(mWhenToAdvanceMS);
             ++mMessageIndex;
         }
     }

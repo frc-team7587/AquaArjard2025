@@ -11,6 +11,7 @@ import frc.robot.subsystems.marquee.MarqueeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.DataLogManager;
+import java.time.Instant;
 import java.util.ArrayList;
 
 /*
@@ -30,23 +31,76 @@ public class RobotContainer {
     kMessagesToDisplay = new ArrayList<>();
     kMessagesToDisplay.add(
       new MarqueeMessageBuilder(
-          "Metuchen Momentum", 100000)
+          "Metuchen Momentum", 20000)
         .setForegroundGreen(63)
         .setForegroundRed(63)
-        .setDelay1(30)
+        .setDelay1(40)
         .build());
     kMessagesToDisplay.add(
       new MarqueeMessageBuilder(
-          "Off the wall!", 1000000)
+          "Off the wall!", 20000)
         .setBackgroundRed(31)
         .setForegroundGreen(63)
-        .setDelay1(30)
+        .setDelay1(40)
         .build());
     kMessagesToDisplay.add(
       new MarqueeMessageBuilder(
-          "Green Alliance", 100000)
+          "Green Alliance", 20000)
         .setForegroundGreen(127)
-        .setDelay1(30)
+        .setDelay1(40)
+        .build());
+      kMessagesToDisplay.add(
+        new MarqueeMessageBuilder(
+            "Thank you, sponsers ...", 20000)
+          .setForegroundRed(42)
+          .setForegroundGreen(42)
+          .setForegroundBlue(42)
+          .setDelay1(40)
+          .build());
+      kMessagesToDisplay.add(
+        new MarqueeMessageBuilder(
+          "Boyd, Dewey, Cheetham, and How, Attournies At Law", 20000)
+        .setForegroundBlue(127)
+        .setDelay1(40)
+        .build());
+      kMessagesToDisplay.add(
+        new MarqueeMessageBuilder(
+          "Pickup Andropov Car Service", 20000)
+        .setForegroundRed(127)
+        .setDelay1(40)
+        .build());
+      kMessagesToDisplay.add(
+        new MarqueeMessageBuilder(
+          "Rolls, Canardly Fine Classic Automobiles", 20000)
+        .setForegroundBlue(127)
+        .setDelay1(40)
+        .build());
+      kMessagesToDisplay.add(
+        new MarqueeMessageBuilder(
+          "Orson Buggy Logistics", 20000)
+        .setForegroundRed(63)
+        .setForegroundBlue(63)
+        .setDelay1(40)
+        .build());
+      kMessagesToDisplay.add(
+        new MarqueeMessageBuilder(
+          "Dustin Dubree Construction", 20000)
+        .setForegroundRed(63)
+        .setForegroundGreen(63)
+        .setDelay1(40)
+        .build());
+      kMessagesToDisplay.add(
+        new MarqueeMessageBuilder(
+          "Horseshoe Road Inn, Guest Accommodations", 20000)
+        .setForegroundGreen(63)
+        .setForegroundBlue(63)
+        .setDelay1(40)
+        .build());
+      kMessagesToDisplay.add(
+        new MarqueeMessageBuilder(
+          "Puns (Dis)Courtesy of Cartalk.Com", 20000)
+        .setForegroundBlue(127)
+        .setDelay1(40)
         .build());
   }
 
@@ -62,6 +116,9 @@ public class RobotContainer {
     // Redirect console output to the log
     DataLogManager.start();
     DataLogManager.logConsoleOutput(true);
+    System.out.print("Robot is starting. at ");
+    System.out.print(Instant.now());
+    System.out.println('.');
 
 
     System.out.println("Creating the marquee subsystem.");

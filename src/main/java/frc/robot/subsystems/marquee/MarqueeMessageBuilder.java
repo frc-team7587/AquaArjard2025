@@ -13,7 +13,8 @@ public class MarqueeMessageBuilder {
     private int mForegroundGreen;
     private int mForegroundBlue;
 
-    private final DisplayCommand mDisplayCommand;
+    private DisplayCommand mDisplayCommand;
+
     private final String mText;
     private final int mDisplayTimeMS;
 
@@ -94,6 +95,11 @@ public class MarqueeMessageBuilder {
 
     public MarqueeMessageBuilder setDelay2(int delay2) {
         this.mDelay2 = delay2;
+        return this;
+    }
+
+    public MarqueeMessageBuilder setDisplayCommand(DisplayCommand command) {
+        this.mDisplayCommand = command;
         return this;
     }
 }
