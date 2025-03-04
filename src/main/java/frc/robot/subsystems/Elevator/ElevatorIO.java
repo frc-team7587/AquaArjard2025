@@ -18,7 +18,10 @@ public interface ElevatorIO {
      * Sets the elevator motors to a specific position.
      * @param position The position to set the motors to.
      */
-    public void setElevatorPosition(double position);
+    //public void setElevatorPosition(double position);
+    public void setSetpoint(double setpoint);
+    public double getVelocity();
+    public double getPosition();
 
     /** 
      * Stops the elevator motors.

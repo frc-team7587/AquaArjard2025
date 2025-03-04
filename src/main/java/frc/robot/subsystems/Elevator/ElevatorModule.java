@@ -12,9 +12,12 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
 
@@ -23,14 +26,23 @@ public class ElevatorModule implements ElevatorIO {
     private final SparkMax rightElevatorMotor;
 
     private final RelativeEncoder leftElevatorMotorEncoder;
-    private final RelativeEncoder rightElevatorMotorEncoder;
 
     private final SparkClosedLoopController leftElevatorMotorController;
-    private final SparkClosedLoopController rightElevatorMotorController;
-
     
 
-    private double setpoint =0;
+  // PID controller uses motion profiling to smoothly move setpoint from current position to goal position
+  // Feed forward tracks the setpoint's velocity/acceleration to move motors without the need for
+  // much PID
+  // PID is only used for small corrections
+  private ProfiledPIDController pidController =
+      new ProfiledPIDController(
+          ElevatorConstants.kP,
+          ElevatorConstants.kI,
+          ElevatorConstants.kD,
+          new TrapezoidProfile.Constraints(
+              ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
+
+  private ElevatorFeedforward feedforward = ElevatorConstants.kFF;
 
     public ElevatorModule() {
 
@@ -38,24 +50,29 @@ public class ElevatorModule implements ElevatorIO {
         rightElevatorMotor = new SparkMax(ElevatorConstants.kElevatorRightMotorID, MotorType.kBrushless);
 
         leftElevatorMotorEncoder = leftElevatorMotor.getEncoder();
-        rightElevatorMotorEncoder = rightElevatorMotor.getEncoder();
+        leftElevatorMotorEncoder.setPosition(0);
 
         leftElevatorMotorController = leftElevatorMotor.getClosedLoopController();
-        rightElevatorMotorController = rightElevatorMotor.getClosedLoopController();        
 
         SparkMaxConfig Lconfig = new SparkMaxConfig();
         SparkMaxConfig Rconfig = new SparkMaxConfig();
-
-        Lconfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD)
-            .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
+        Lconfig
+            .smartCurrentLimit(80)
+            .idleMode(IdleMode.kBrake)
+            .voltageCompensation(12.0)
+            .inverted(false);
+        Lconfig
+            .encoder
+            .positionConversionFactor(ElevatorConstants.kPositionConversionFactor)
+            .velocityConversionFactor(ElevatorConstants.kPositionConversionFactor / 60.0);
         Rconfig
             .apply(Lconfig)
-            .follow(10);
+            .follow(leftElevatorMotor, false);
 
         leftElevatorMotor.configure(Lconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightElevatorMotor.configure(Rconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+        pidController.setTolerance(ElevatorConstants.kSetpointToleranceMeters);
 
 
     }
@@ -71,12 +88,31 @@ public class ElevatorModule implements ElevatorIO {
         leftElevatorMotor.set(speed);
     }
 
+    // @Override
+    // public void setElevatorPosition(double position) {
+    //     leftElevatorMotorController.setReference(
+    //     position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ElevatorConstants.kFF);
+    //     //position, ControlType.kPosition);
+    // }
+
     @Override
-    public void setElevatorPosition(double position) {
-        leftElevatorMotorController.setReference(
-        position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ElevatorConstants.kFF);
-        //position, ControlType.kPosition);
+    public void setSetpoint(double setpoint) {
+      pidController.setGoal(setpoint);
+      pidController.reset(getPosition(), getVelocity());
     }
+
+    @Override
+    public double getVelocity() {
+      return leftElevatorMotorEncoder.getVelocity();
+    }
+
+    @Override
+    public double getPosition() {
+      // get the absolute position in radians, then convert to meters
+      return leftElevatorMotorEncoder.getPosition();
+    }
+
+
     @Override
     public void resetElevator(){
         leftElevatorMotorEncoder.setPosition(0);
@@ -89,7 +125,7 @@ public class ElevatorModule implements ElevatorIO {
 
     @Override
     public double getElevatorPosition() {
-        return (leftElevatorMotorEncoder.getPosition() + rightElevatorMotorEncoder.getPosition()) / 2;
+        return (leftElevatorMotorEncoder.getPosition());
     }
 }
 
