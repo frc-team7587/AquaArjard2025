@@ -18,7 +18,7 @@ public class ElevatorConstants {
     public static final double kElevatorLevel0 = 0.0;
     public static final double kElevatorLevel1 = 4.3;
     public static final double kElevatorLevel2 = 13.3;
-    public static final double kElevatorLevel3 = 29;
+    public static final double kElevatorLevel3 = 29.5;
 
     public static final double kP = 0.05;
     public static final double kI = 0.0;
@@ -27,7 +27,7 @@ public class ElevatorConstants {
     public static final double kMinOutput = -1.0;
     public static final double kMaxOutput = 1.0;
 
-    public static final double kElevatorVoltage = 3; //for static routine testing
+    public static final double kElevatorVoltage = 2; //for static routine testing
     //output up = 1.1
     //output down = 1
 }

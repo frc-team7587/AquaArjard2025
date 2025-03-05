@@ -36,7 +36,7 @@ public class AlgaeIntake extends SubsystemBase{
     public Command turntoUp(){
         return startEnd(
             () -> intake.setPivotSpeed(AlgaeIntakeConstants.kPivotSpeedUp),
-            () -> intake.setIntakeSpeed(0)
+            () -> intake.setPivotSpeed(0)
         );
 
     }
@@ -44,7 +44,10 @@ public class AlgaeIntake extends SubsystemBase{
         return run(() -> intake.setPivotPosition(AlgaeIntakeConstants.kPivotNeutalPosition));
     }
     public Command turntoDown(){
-        return run(() -> intake.setPivotPosition(AlgaeIntakeConstants.kPivotMinPosition));
+        return startEnd(
+            () -> intake.setPivotSpeed(AlgaeIntakeConstants.kPivotSpeedDown),
+            () -> intake.setPivotSpeed(0)
+        );
 
     }
     public Command turntoZero(){

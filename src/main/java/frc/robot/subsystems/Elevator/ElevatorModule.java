@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Elevator;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -13,6 +14,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -52,6 +54,7 @@ public class ElevatorModule implements ElevatorIO {
         SparkMaxConfig Rconfig = new SparkMaxConfig();
 
         Lconfig
+            .smartCurrentLimit(60)
             .idleMode(IdleMode.kBrake);
         Lconfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -59,6 +62,7 @@ public class ElevatorModule implements ElevatorIO {
             .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
 
         Rconfig
+            .smartCurrentLimit(60)
             .idleMode(IdleMode.kBrake)
             .follow(ElevatorConstants.kElevatorLeftMotorID);
         Rconfig.closedLoop
@@ -68,7 +72,7 @@ public class ElevatorModule implements ElevatorIO {
 
         leftElevatorMotor.configure(Lconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightElevatorMotor.configure(Rconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        
+
 
        
 
@@ -77,11 +81,11 @@ public class ElevatorModule implements ElevatorIO {
 
     @Override
     public void elevatorUp(double speed) {
-        // leftElevatorMotor.setVoltage(ElevatorConstants.kElevatorVoltage);
-        // rightElevatorMotor.setVoltage(ElevatorConstants.kElevatorVoltage);
+        //leftElevatorMotor.setVoltage(ElevatorConstants.kElevatorVoltage);
+       // rightElevatorMotor.setVoltage(ElevatorConstants.kElevatorVoltage);
 
         leftElevatorMotor.set(speed);
-        rightElevatorMotor.set(speed);
+        //rightElevatorMotor.set(speed);
     }
 
     @Override
@@ -106,10 +110,10 @@ public class ElevatorModule implements ElevatorIO {
 
         leftElevatorMotorController.setReference(
             position, ControlType.kPosition, ClosedLoopSlot.kSlot0, 
-            new ElevatorFeedforward(0.1,1.3,1.5,0.05).calculate(0));
-
-
-
+            new ElevatorFeedforward(0.2,1.44,1.5,0.05).calculate(0));
+        // rightElevatorMotorController.setReference(
+        //         position, ControlType.kPosition, ClosedLoopSlot.kSlot0, 
+        //         new ElevatorFeedforward(0.2,1.44,1.5,0.05).calculate(0));
 
 
         //new ElevatorFeedforward(1.175,1.625,4.6,0.15).calculate(0));

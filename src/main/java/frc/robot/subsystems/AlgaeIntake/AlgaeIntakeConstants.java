@@ -10,7 +10,7 @@ public class AlgaeIntakeConstants {
     public static final int kPivotMotorID = 12;
 
     public static final double kPivotMaxPosition = 0.0;
-    public static final double kPivotNeutalPosition = -2.0;
+    public static final double kPivotNeutalPosition = -3.3;
     public static final double kPivotZeroPosition = 0.0;
     public static final double kPivotMinPosition = -7.0;
 

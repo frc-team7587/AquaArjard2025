@@ -83,37 +83,35 @@ public class RobotContainer {
         )
     );
 
-    //sequantial command group for level 0 scoring, scores the corala and then brings elevator back to 0
+    //sequantial command group for level 0 sco(ring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L0 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel0(),
-      m_coralIntake.turntoNeutral(),
-      m_coralIntake.outtakeCoral().withTimeout(1.5),
-      m_elevator.resetElevatorPosition()
+      m_elevator.elevatorToLevel0().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+      // m_coralIntake.outtakeCoral().withTimeout(1.5),
+      // m_elevator.resetElevatorPosition()
     );
 
     //sequantial command group for level 1 scoring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L1 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel1(),
-      m_coralIntake.turntoNeutral(),
-      m_coralIntake.outtakeCoral().withTimeout(1.5),
-      m_elevator.resetElevatorPosition()
+      m_elevator.elevatorToLevel1().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+      // m_coralIntake.outtakeCoral().withTimeout(1.5),
+      // m_elevator.resetElevatorPosition()
     );
 
     //sequantial command group for level 2 scoring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L2 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel2(),
-      m_coralIntake.turntoNeutral(),
-      m_coralIntake.outtakeCoral().withTimeout(1.5),
-      m_elevator.resetElevatorPosition()
+      m_elevator.elevatorToLevel2().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+      // m_coralIntake.outtakeCoral().withTimeout(1.5),
+      // m_elevator.resetElevatorPosition()
     );
 
     //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L3 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel3(),
-      m_coralIntake.setPivotPosition(2.4),
-      m_coralIntake.outtakeCoral().withTimeout(1.5),
-      m_elevator.resetElevatorPosition()
+      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2.5)).withTimeout(1)
+      // m_coralIntake.outtakeCoral().withTimeout(1.5),
+      // m_elevator.resetElevatorPosition()
     );
+
+  
 
     //OPERATOR CONTROLS
 
@@ -128,6 +126,21 @@ public class RobotContainer {
 
     //when top on Dpad is pressed, the level 3 sequence is run
     m_operatorController.povUp().onTrue(L3);
+
+    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(2.55).alongWith(m_coralIntake.setPivotPosition(4.5).withTimeout(1)));
+
+    m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
+
+    m_operatorController.leftBumper().whileTrue(m_algaeIntake.intakeAlgae());
+    m_operatorController.rightBumper().whileTrue(m_algaeIntake.intakeAlgae());
+
+    m_operatorController.leftTrigger().whileTrue(m_coralIntake.intakeCoral());
+    m_operatorController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
+
+    m_operatorController.start().and(m_operatorController.b()).whileTrue(m_algaeIntake.turntoDown());
+    m_operatorController.start().and(m_operatorController.x()).whileTrue(m_algaeIntake.turntoUp());
+
+
     
     
   }
