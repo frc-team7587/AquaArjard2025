@@ -67,6 +67,8 @@ public class UsbDisplayConnection implements DisplayConnection {
 
             SerialPort usbPort = new UsbSerialPortBuilder(usbDevicePath).build();
             if (usbPort != null) {
+                usbPort.reset();
+                usbPort.flush();
                 built = new UsbDisplayConnection(usbPort);
             } else {
                 System.out.println("SerialPort creation failed.");
