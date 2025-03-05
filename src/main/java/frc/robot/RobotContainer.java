@@ -51,7 +51,7 @@ public class RobotContainer {
         .build());
       kMessagesToDisplay.add(
         new MarqueeMessageBuilder(
-            "Thank you, sponsers ...", 20000)
+            "Thank you, sponsors ...", 20000)
           .setForegroundRed(42)
           .setForegroundGreen(42)
           .setForegroundBlue(42)
@@ -114,11 +114,14 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Redirect console output to the log
-    DataLogManager.start();
-    DataLogManager.logConsoleOutput(true);
-    System.out.print("Robot is starting. at ");
-    System.out.print(Instant.now());
-    System.out.println('.');
+    DataLogManager.log(new StringBuilder("Robot is starting. at ")
+        .append(Instant.now())
+        .append('.')
+        .toString());
+
+    // System.out.print("Robot is starting. at ");
+    // System.out.print(Instant.now());
+    // System.out.println('.');
 
 
     System.out.println("Creating the marquee subsystem.");

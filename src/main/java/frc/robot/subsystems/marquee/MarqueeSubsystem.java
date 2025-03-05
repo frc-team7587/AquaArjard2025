@@ -8,6 +8,8 @@ import org.metuchenmomentum.marquee.DisplayConnection;
 import org.metuchenmomentum.marquee.DisplayConnectionFactory;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.DataLogManager;
+
 
 /*
  * Marquee management subsystem that repeatedly 
@@ -116,11 +118,13 @@ public final class MarqueeSubsystem extends SubsystemBase {
     public static MarqueeSubsystem usbConnection(
         List<MarqueeMessage> messages,
         int millisecondsPerTick) {
-            System.out.println("Connecting to the ESP32 via ttyUSBn.");
+            // System.out.println("Connecting to the ESP32 via ttyUSBn.");
+            DataLogManager.log("Connecting to the ESP32 via ttyUSBn.");
             DisplayConnection marqueeConnection = DisplayConnectionFactory.usbConnection();
-            System.out.println(
-                "Created marquee connection type: " + marqueeConnection.getClass().getCanonicalName());
-            return new MarqueeSubsystem(
+            // System.out.println(
+            //     "Created marquee connection type: " + marqueeConnection.getClass().getCanonicalName());
+            DataLogManager.log("Created marquee connection type: " + marqueeConnection.getClass().getCanonicalName());
+                return new MarqueeSubsystem(
                marqueeConnection,
                 messages,
                 millisecondsPerTick);
@@ -146,6 +150,7 @@ public final class MarqueeSubsystem extends SubsystemBase {
             mWhenToAdvanceMS = 0;
             mMessageIndex = 0;
             mIterationCount = 0;
+        DataLogManager.log("MS per tick: " + millisecondsPerTick);
     }
 
     /**
@@ -170,11 +175,7 @@ public final class MarqueeSubsystem extends SubsystemBase {
                 mActiveMessages = mMessages;
             }
             MarqueeMessage showMe = mActiveMessages.get(mMessageIndex);
-            // System.out.print("Showing message number ");
-            // System.out.print(mMessageIndex);
-            // System.out.print(", \"");
-            // System.out.print(showMe.displayMessage().toString());
-            // System.out.println("\"");
+            DataLogManager.log("Sending: " + showMe);
             showMessage(showMe);
             mWhenToAdvanceMS = showMe.durationMs();
             // System.out.print("Display duration: ");
