@@ -106,7 +106,7 @@ public class RobotContainer {
 
     //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L3 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2.5)).withTimeout(1)
+      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2.7)).withTimeout(1)
       // m_coralIntake.outtakeCoral().withTimeout(1.5),
       // m_elevator.resetElevatorPosition()
     );
@@ -127,12 +127,12 @@ public class RobotContainer {
     //when top on Dpad is pressed, the level 3 sequence is run
     m_operatorController.povUp().onTrue(L3);
 
-    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(2.55).alongWith(m_coralIntake.setPivotPosition(4.5).withTimeout(1)));
+    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(2.55).alongWith(m_coralIntake.setPivotPosition(5.0).withTimeout(1)));
 
     m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
 
     m_operatorController.leftBumper().whileTrue(m_algaeIntake.intakeAlgae());
-    m_operatorController.rightBumper().whileTrue(m_algaeIntake.intakeAlgae());
+    m_operatorController.rightBumper().whileTrue(m_algaeIntake.outtakeAlgae());
 
     m_operatorController.leftTrigger().whileTrue(m_coralIntake.intakeCoral());
     m_operatorController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
@@ -140,6 +140,9 @@ public class RobotContainer {
     m_operatorController.start().and(m_operatorController.b()).whileTrue(m_algaeIntake.turntoDown());
     m_operatorController.start().and(m_operatorController.x()).whileTrue(m_algaeIntake.turntoUp());
 
+    m_operatorController.x().onTrue(m_coralIntake.setPivotPosition(4.5));
+
+    
 
     
     
@@ -156,6 +159,28 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     
+  }
+
+  double limelight_aim_proportional()
+  {    
+    // kP (constant of proportionality)
+    // this is a hand-tuned number that determines the aggressiveness of our proportional control loop
+    // if it is too high, the robot will oscillate around.
+    // if it is too low, the robot will never reach its target
+    // if the robot never turns in the correct direction, kP should be inverted.
+    double kP = .035;
+
+    // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
+    // your limelight 3 feed, tx should return roughly 31 degrees.
+    double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
+
+    // convert to radians per second for our drive method
+    targetingAngularVelocity *= DriveConstants.kMaxAngularSpeed;
+
+    //invert since tx is positive when the target is to the right of the crosshair
+    targetingAngularVelocity *= -1.0;
+
+    return targetingAngularVelocity;
   }
 
   /**

@@ -38,6 +38,11 @@ public interface ElevatorIO {
     public void resetElevator();
     public double getLvoltage();
     public double getRvoltage();
-
+    public double getLcurrent();
+    public double getRcurrent();
+    public double getLoutput();
+    public double getRoutput();
+    public double getLtemp();
+    public double getRtemp();
 
 }

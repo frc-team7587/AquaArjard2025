@@ -32,7 +32,7 @@ public class AlgaeIntakeSparkMax implements AlgaeIntakeIO{
         intakeMotor.set(speed);
     }
     @Override
-    public void setPivotSpeed(double speed){
+    public void setPivotSpeed(double speed){ 
         pivotMotor.set(speed);
     }
     @Override

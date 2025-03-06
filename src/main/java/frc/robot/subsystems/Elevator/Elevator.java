@@ -83,6 +83,13 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Left voltage", elevator.getLvoltage());
     SmartDashboard.putNumber("Right voltage", elevator.getRvoltage());
 
+    SmartDashboard.putNumber("Left current", elevator.getLcurrent());
+    SmartDashboard.putNumber("Right current", elevator.getRcurrent());
 
+    SmartDashboard.putNumber("Left output", elevator.getLoutput());
+    SmartDashboard.putNumber("Right output", elevator.getLoutput());
+
+    SmartDashboard.putNumber("Left temp", elevator.getLtemp());
+    SmartDashboard.putNumber("Right temp", elevator.getRtemp());
   }
 }

@@ -54,7 +54,7 @@ public class ElevatorModule implements ElevatorIO {
         SparkMaxConfig Rconfig = new SparkMaxConfig();
 
         Lconfig
-            .smartCurrentLimit(60)
+            .smartCurrentLimit(50)
             .idleMode(IdleMode.kBrake);
         Lconfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -62,7 +62,7 @@ public class ElevatorModule implements ElevatorIO {
             .outputRange(ElevatorConstants.kMinOutput, ElevatorConstants.kMaxOutput);
 
         Rconfig
-            .smartCurrentLimit(60)
+            .smartCurrentLimit(50)
             .idleMode(IdleMode.kBrake)
             .follow(ElevatorConstants.kElevatorLeftMotorID);
         Rconfig.closedLoop
@@ -143,12 +143,45 @@ public class ElevatorModule implements ElevatorIO {
     }
     @Override
     public double getLvoltage() {
-        return leftElevatorMotor.getOutputCurrent();
+        return leftElevatorMotor.getBusVoltage();
     }
     @Override
     public double getRvoltage() {
-        return rightElevatorMotor.getOutputCurrent();
+        return rightElevatorMotor.getBusVoltage();
     }
+
+    @Override
+    public double getLcurrent() {
+       return leftElevatorMotor.getOutputCurrent();
+    }
+
+    @Override
+    public double getRcurrent() {
+        return rightElevatorMotor.getOutputCurrent();
+
+    }
+
+    @Override
+    public double getLoutput() {
+        return leftElevatorMotor.getAppliedOutput();
+    }
+
+    @Override
+    public double getRoutput() {
+        return rightElevatorMotor.getAppliedOutput();
+
+    }
+
+    @Override
+    public double getLtemp() {
+        return leftElevatorMotor.getMotorTemperature();
+    }
+
+    @Override
+    public double getRtemp() {
+        return rightElevatorMotor.getMotorTemperature();
+    }
+    
 }
 
 
