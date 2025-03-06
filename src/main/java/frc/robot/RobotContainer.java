@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
@@ -42,8 +43,10 @@ import java.util.List;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.wpilibj.IterativeRobotBase;
+
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -70,6 +73,7 @@ public class RobotContainer {
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
   private final SendableChooser<Command> autoChooser;
+  private final Field2d field;
 
   
   /**
@@ -91,11 +95,31 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Shoot Coral", m_coralIntake.outtakeCoral());
     NamedCommands.registerCommand("Intake Coral", m_coralIntake.intakeCoral());
-    
+
     NamedCommands.registerCommand("Turn Coral to Neutral", m_coralIntake.turntoNeutral());
     NamedCommands.registerCommand("Turn Coral to Up", m_coralIntake.turntoUp());
     NamedCommands.registerCommand("Turn Coral to Down", m_coralIntake.turntoDown());
 
+    field = new Field2d();
+        SmartDashboard.putData("Field", field);
+
+        // Logging callback for current robot pose
+        PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
+            // Do whatever you want with the pose here
+            field.setRobotPose(pose);
+        });
+
+        // Logging callback for target robot pose
+        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+            // Do whatever you want with the pose here
+            field.getObject("target pose").setPose(pose);
+        });
+
+        // Logging callback for the active path, this is sent as a list of poses
+        PathPlannerLogging.setLogActivePathCallback((poses) -> {
+            // Do whatever you want with the poses here
+            field.getObject("path").setPoses(poses);
+        });
 
 
     // Configure the button bindings
