@@ -120,17 +120,13 @@ public class Robot extends TimedRobot {
     var rot =
         -m_rotLimiter.calculate(MathUtil.applyDeadband(m_driverController.getRightX(), 0.02))
             * DriveConstants.kMaxAngularSpeed;
+          
+    xSpeed = limelight_align_proportional()[0];
+    ySpeed = limelight_align_proportional()[1];
+    rot = limelight_align_proportional()[2];
 
-    // while the A-button is pressed, overwrite some of the driving values with the output of our limelight methods
-    if(m_driverController.getAButton())
-    {
-        xSpeed = limelight_align_proportional()[0];
-        ySpeed = limelight_align_proportional()[1];
-        rot = limelight_align_proportional()[2];
-
-        //while using Limelight, turn off field-relative driving.
-        fieldRelative = false;
-    }
+    //while using Limelight, turn off field-relative driving.
+    fieldRelative = false;
 
     m_drive.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
   }
