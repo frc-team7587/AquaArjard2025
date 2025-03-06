@@ -46,19 +46,14 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final SwerveDrive m_robotDrive = new SwerveDrive();
+  //private final SwerveDrive m_robotDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
   private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
 
 
-  // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
-
   // The driver's controller
-  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  //CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   // The operator's controller
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
   
@@ -70,18 +65,18 @@ public class RobotContainer {
     configureButtonBindings();
 
     
-    m_robotDrive.setDefaultCommand(
-         // The left stick controls translation of the robot.
-         // Turning is controlled by the X axis of the right stick.
-         new RunCommand(
-             () -> m_robotDrive.drive(
-                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                 -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                 true, Robot.getPeriod),
-            m_robotDrive
-        )
-    );
+    // m_robotDrive.setDefaultCommand(
+    //      // The left stick controls translation of the robot.
+    //      // Turning is controlled by the X axis of the right stick.
+    //      new RunCommand(
+    //          () -> m_robotDrive.drive(
+    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+    //              -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
+    //              true, Robot.getPeriod),
+    //         m_robotDrive
+    //     )
+    // );
 
     //sequantial command group for level 0 sco(ring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L0 = new SequentialCommandGroup(
