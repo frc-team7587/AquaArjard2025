@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     m_robotContainer = new RobotContainer();
   }
-
+/* 
    // simple proportional turning control with Limelight.
   // "proportional control" is a control algorithm in which the output is proportional to the error.
   // in this case, we are going to return an angular velocity that is proportional to the 
@@ -71,7 +71,34 @@ public class Robot extends TimedRobot {
     double targetingForwardSpeed = distanceError * kP * DriveConstants.kMaxSpeedMetersPerSecond;
     return targetingForwardSpeed;
   }
+*/
 
+  double[] limelight_align_proportional(){
+    
+    // Retrieve Limelight offsets
+    double tx = LimelightHelpers.getTX("limelight");
+    double ta = LimelightHelpers.getTA("limelight");
+
+    // Define proportional control constants
+    double kP_x = 0.05;
+    double kP_a = 0.05;
+
+    double desiredArea = 6.88;
+
+    // Calculate translation speeds
+    double xSpeed = tx * kP_x * (DriveConstants.kMaxSpeedMetersPerSecond);
+    double ySpeed = ta * kP_a * (DriveConstants.kMaxSpeedMetersPerSecond);
+
+    // Set rotation to zero
+    double rot = 0.0;
+
+    // Disable field-relative driving
+    boolean fieldRelative = false;
+
+    // Return the calculated speeds
+    return new double[] {xSpeed, ySpeed, rot};
+
+  }
   private void limelightDrive(boolean fieldRelative) {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
@@ -97,11 +124,9 @@ public class Robot extends TimedRobot {
     // while the A-button is pressed, overwrite some of the driving values with the output of our limelight methods
     if(m_driverController.getAButton())
     {
-        final var rot_limelight = limelight_aim_proportional();
-        rot = rot_limelight;
-
-        final var forward_limelight = limelight_range_proportional();
-        xSpeed = forward_limelight;
+        xSpeed = limelight_align_proportional()[0];
+        ySpeed = limelight_align_proportional()[1];
+        rot = limelight_align_proportional()[2];
 
         //while using Limelight, turn off field-relative driving.
         fieldRelative = false;
