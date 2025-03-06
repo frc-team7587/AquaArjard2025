@@ -86,8 +86,8 @@ public class Robot extends TimedRobot {
     double desiredArea = 6.88;
 
     // Calculate translation speeds
-    double xSpeed = tx * kP_x * (DriveConstants.kMaxSpeedMetersPerSecond);
-    double ySpeed = ta * kP_a * (DriveConstants.kMaxSpeedMetersPerSecond);
+    double xSpeed = (desiredArea - ta) * kP_a * (DriveConstants.kMaxSpeedMetersPerSecond / 2);
+    double ySpeed = tx * kP_x * (DriveConstants.kMaxSpeedMetersPerSecond / 2);
 
     // Set rotation to zero
     double rot = 0.0;
