@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Vision.LimelightHelpers;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
@@ -43,7 +45,7 @@ public class Robot extends TimedRobot {
     // if it is too high, the robot will oscillate around.
     // if it is too low, the robot will never reach its target
     // if the robot never turns in the correct direction, kP should be inverted.
-    double kP = .025;
+    double kP = .007;
 
     // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
     // your limelight 3 feed, tx should return roughly 31 degrees.
@@ -64,7 +66,7 @@ public class Robot extends TimedRobot {
   double limelight_range_proportional()
   {    
     double kP = .05;
-    double desiredArea = 3.1;
+    double desiredArea = 6.88;
     double distanceError = desiredArea - LimelightHelpers.getTA("limelight");
     double targetingForwardSpeed = distanceError * kP * DriveConstants.kMaxSpeedMetersPerSecond;
     return targetingForwardSpeed;
@@ -108,28 +110,18 @@ public class Robot extends TimedRobot {
     m_drive.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
   }
   private void drive(boolean fieldRelative) {
-    // Get the x speed. We are inverting this because Xbox controllers return
-    // negative values when we push forward.
-    var xSpeed =
-        -m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_driverController.getLeftY(), 0.02))
-            * DriveConstants.kMaxSpeedMetersPerSecond;
-
-    // Get the y speed or sideways/strafe speed. We are inverting this because
-    // we want a positive value when we pull to the left. Xbox controllers
-    // return positive values when you pull to the right by default.
-    var ySpeed =
-        -m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_driverController.getLeftX(), 0.02))
-            * DriveConstants.kMaxSpeedMetersPerSecond;
-
-    // Get the rate of angular rotation. We are inverting this because we want a
-    // positive value when we pull to the left (remember, CCW is positive in
-    // mathematics). Xbox controllers return positive values when you pull to
-    // the right by default.
-    var rot =
-        -m_rotLimiter.calculate(MathUtil.applyDeadband(m_driverController.getRightX(), 0.02))
-            * DriveConstants.kMaxAngularSpeed;
-            
-    m_drive.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
+    m_drive.setDefaultCommand(
+         // The left stick controls translation of the robot.
+         // Turning is controlled by the X axis of the right stick.
+         new RunCommand(
+             () -> m_drive.drive(
+                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                 -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                 true, Robot.getPeriod),
+            m_drive
+        )
+    );
   }
 
   @Override
