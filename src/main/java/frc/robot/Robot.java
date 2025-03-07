@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     m_robotContainer = new RobotContainer();
   }
-/* 
+
    // simple proportional turning control with Limelight.
   // "proportional control" is a control algorithm in which the output is proportional to the error.
   // in this case, we are going to return an angular velocity that is proportional to the 
@@ -52,7 +52,7 @@ public class Robot extends TimedRobot {
     double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
 
     // convert to radians per second for our drive method
-    targetingAngularVelocity *= DriveConstants.kMaxAngularSpeed;
+    targetingAngularVelocity *= (DriveConstants.kMaxAngularSpeed/3);
 
     //invert since tx is positive when the target is to the right of the crosshair
     targetingAngularVelocity *= -1.0;
@@ -65,29 +65,103 @@ public class Robot extends TimedRobot {
   // if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
   double limelight_range_proportional()
   {    
-    double kP = .05;
-    double desiredArea = 6.88;
+    //double kP = .2; //follow mode
+    double kP = 0.05;  //align mode
+    double desiredArea = 1.3;
     double distanceError = desiredArea - LimelightHelpers.getTA("limelight");
     double targetingForwardSpeed = distanceError * kP * DriveConstants.kMaxSpeedMetersPerSecond;
     return targetingForwardSpeed;
   }
-*/
 
+  double limmelight_strafe_proportional(boolean left)
+  {
+    if(left){
+    double kP = .05;
+    double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight") * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3) * -1.0;
+    return targetingSidewaysSpeed;
+    } else {
+      double kP = .05;
+    double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight") + 2  * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3) * -1.0;
+    return targetingSidewaysSpeed;
+    }
+  };
+
+  private void drive(boolean fieldRelative) {
+    // Get the x speed. We are inverting this because Xbox controllers return
+    // negative values when we push forward.
+    var xSpeed =
+        -m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_driverController.getLeftY(), 0.1))
+            * (DriveConstants.kMaxSpeedMetersPerSecond / 2);
+
+    // Get the y speed or sideways/strafe speed. We are inverting this because
+    // we want a positive value when we pull to the left. Xbox controllers
+    // return positive values when you pull to the right by default.
+    var ySpeed =
+        -m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1))
+            * (DriveConstants.kMaxSpeedMetersPerSecond / 2);
+
+    // Get the rate of angular rotation. We are inverting this because we want a
+    // positive value when we pull to the left (remember, CCW is positive in
+    // mathematics). Xbox controllers return positive values when you pull to
+    // the right by default.
+    var rot =
+        -m_rotLimiter.calculate(MathUtil.applyDeadband(m_driverController.getRightX(), 0.1))
+            * DriveConstants.kMaxAngularSpeed;
+
+    // while the A-button is pressed, overwrite some of the driving values with the output of our limelight methods
+    if(m_driverController.getBButton())
+    {
+        final var rot_limelight = limelight_aim_proportional();
+        rot = rot_limelight;
+
+        final var forward_limelight = limelight_range_proportional();
+        xSpeed = forward_limelight;
+
+        final var sideways_limelight = limmelight_strafe_proportional(false);
+        ySpeed = sideways_limelight;
+
+        //while using Limelight, turn off field-relative driving.
+        fieldRelative = false;
+    }
+    if(m_driverController.getXButton())
+    {
+        final var rot_limelight = limelight_aim_proportional();
+        rot = rot_limelight;
+
+        final var forward_limelight = limelight_range_proportional();
+        xSpeed = forward_limelight;
+
+        final var sideways_limelight = limmelight_strafe_proportional(true);
+        ySpeed = sideways_limelight;
+
+        //while using Limelight, turn off field-relative driving.
+        fieldRelative = false;
+    }
+
+    m_drive.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
+  }
+
+/* 
   double[] limelight_align_proportional(){
     
     // Retrieve Limelight offsets
     double tx = LimelightHelpers.getTX("limelight");
     double ta = LimelightHelpers.getTA("limelight");
+    double[] tAngle = LimelightHelpers.getBotPose("limelight");
+
 
     // Define proportional control constants
-    double kP_x = 0.05;
-    double kP_a = 0.05;
+    double kP_x = 0.02;
+    double kP_a = 0.02;
+    double kP_rot = 0.01;
 
-    double desiredArea = 6.88;
+    double desiredArea = 6.28;
 
     // Calculate translation speeds
     double xSpeed = (desiredArea - ta) * kP_a * (DriveConstants.kMaxSpeedMetersPerSecond / 2);
-    double ySpeed = tx * kP_x * (DriveConstants.kMaxSpeedMetersPerSecond / 2);
+    double ySpeed = tx * kP_x * (DriveConstants.kMaxSpeedMetersPerSecond / 2) * -1.0;
+    double rot = 
+
 
     // Set rotation to zero
     double rot = 0.0;
@@ -144,15 +218,17 @@ public class Robot extends TimedRobot {
         )
     );
   }
-
+*/
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    if (m_driverController.getAButton()) {
-      limelightDrive(false);
-  } else {
-      drive(true);
-  }
+  //   if (m_driverController.getAButton()) {
+  //     limelightDrive(false);
+  // } else {
+  //     drive(true);
+  // }
+
+  drive(false);
   }
 
   @Override
