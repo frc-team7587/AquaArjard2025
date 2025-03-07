@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.CoralIntake.CoralIntake;
+import frc.robot.subsystems.CoralIntake.CoralIntakeIO;
+import frc.robot.subsystems.CoralIntake.CoralIntakeSparkMax;
 import frc.robot.subsystems.Vision.LimelightHelpers;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
@@ -23,6 +26,7 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
   private final SwerveDrive m_drive = new SwerveDrive();
   private final XboxController m_driverController = new XboxController(0);
+  private final CoralIntake m_CoralIntake = new CoralIntake(new CoralIntakeSparkMax());
 
     // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
@@ -32,6 +36,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+
   }
 
    // simple proportional turning control with Limelight.
@@ -67,7 +72,7 @@ public class Robot extends TimedRobot {
   {    
     //double kP = .2; //follow mode
     double kP = 0.05;  //align mode
-    double desiredArea = 1.3;
+    double desiredArea = 7.1;
     double distanceError = desiredArea - LimelightHelpers.getTA("limelight");
     double targetingForwardSpeed = distanceError * kP * DriveConstants.kMaxSpeedMetersPerSecond;
     return targetingForwardSpeed;
@@ -81,8 +86,8 @@ public class Robot extends TimedRobot {
     return targetingSidewaysSpeed;
     } else {
       double kP = .05;
-    double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight") + 2  * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3) * -1.0;
-    return targetingSidewaysSpeed;
+    double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight")  * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3) * -1.0;
+    return targetingSidewaysSpeed + (25 * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3));
     }
   };
 
@@ -90,23 +95,20 @@ public class Robot extends TimedRobot {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
     var xSpeed =
-        -m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_driverController.getLeftY(), 0.1))
-            * (DriveConstants.kMaxSpeedMetersPerSecond / 2);
+    -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband);
 
     // Get the y speed or sideways/strafe speed. We are inverting this because
     // we want a positive value when we pull to the left. Xbox controllers
     // return positive values when you pull to the right by default.
     var ySpeed =
-        -m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_driverController.getLeftX(), 0.1))
-            * (DriveConstants.kMaxSpeedMetersPerSecond / 2);
+    -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband);
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    var rot =
-        -m_rotLimiter.calculate(MathUtil.applyDeadband(m_driverController.getRightX(), 0.1))
-            * DriveConstants.kMaxAngularSpeed;
+    var rot = 
+    -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband);
 
     // while the A-button is pressed, overwrite some of the driving values with the output of our limelight methods
     if(m_driverController.getBButton())
@@ -228,11 +230,19 @@ public class Robot extends TimedRobot {
   //     drive(true);
   // }
 
-  drive(false);
+  drive(true);
   }
 
   @Override
-  public void disabledInit() {}
+  public void robotInit(){
+    // m_CoralIntake.setPivotPosition(4.5);
+
+  }
+
+
+  @Override
+  public void disabledInit() {
+  }
 
   @Override
   public void disabledPeriodic() {}

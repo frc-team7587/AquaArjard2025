@@ -65,6 +65,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     
+    
     // m_robotDrive.setDefaultCommand(
     //      // The left stick controls translation of the robot.
     //      // Turning is controlled by the X axis of the right stick.
@@ -101,7 +102,7 @@ public class RobotContainer {
 
     //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L3 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2.7)).withTimeout(1)
+      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2.5)).withTimeout(1)
       // m_coralIntake.outtakeCoral().withTimeout(1.5),
       // m_elevator.resetElevatorPosition()
     );
