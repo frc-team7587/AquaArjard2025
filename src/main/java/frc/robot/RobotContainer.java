@@ -56,7 +56,7 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final SwerveDrive m_robotDrive = new SwerveDrive();
+  //private final SwerveDrive m_robotDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
   private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
@@ -126,18 +126,18 @@ public class RobotContainer {
     configureButtonBindings();
 
     
-    m_robotDrive.setDefaultCommand(
-         // The left stick controls translation of the robot.
-         // Turning is controlled by the X axis of the right stick.
-         new RunCommand(
-             () -> m_robotDrive.drive(
-                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                 -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                 -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                 true, Robot.getPeriod),
-            m_robotDrive
-        )
-    );
+    // m_robotDrive.setDefaultCommand(
+    //      // The left stick controls translation of the robot.
+    //      // Turning is controlled by the X axis of the right stick.
+    //      new RunCommand(
+    //          () -> m_robotDrive.drive(
+    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+    //              -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
+    //              true, Robot.getPeriod),
+    //         m_robotDrive
+    //     )
+    // );
 
     //sequantial command group for level 0 sco(ring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L0 = new SequentialCommandGroup(

@@ -26,8 +26,7 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
   private final SwerveDrive m_drive = new SwerveDrive();
   private final XboxController m_driverController = new XboxController(0);
-  private final CoralIntake m_CoralIntake = new CoralIntake(new CoralIntakeSparkMax());
-
+  
     // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
@@ -80,15 +79,15 @@ public class Robot extends TimedRobot {
 
   double limmelight_strafe_proportional(boolean left)
   {
-    if(left){
+    // if(left){
     double kP = .05;
     double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight") * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3) * -1.0;
     return targetingSidewaysSpeed;
-    } else {
-      double kP = .05;
-    double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight")  * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3) * -1.0;
-    return targetingSidewaysSpeed + (25 * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3));
-    }
+    // } else {
+    //   double kP = .05;
+    // double targetingSidewaysSpeed = LimelightHelpers.getTX("limelight")  * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3) * -1.0;
+    // return targetingSidewaysSpeed + (25 * kP * (DriveConstants.kMaxSpeedMetersPerSecond/3));
+    // }
   };
 
   private void drive(boolean fieldRelative) {
@@ -111,20 +110,20 @@ public class Robot extends TimedRobot {
     -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband);
 
     // while the A-button is pressed, overwrite some of the driving values with the output of our limelight methods
-    if(m_driverController.getBButton())
-    {
-        final var rot_limelight = limelight_aim_proportional();
-        rot = rot_limelight;
+    // if(m_driverController.getBButton())
+    // {
+    //     final var rot_limelight = limelight_aim_proportional();
+    //     rot = rot_limelight;
 
-        final var forward_limelight = limelight_range_proportional();
-        xSpeed = forward_limelight;
+    //     final var forward_limelight = limelight_range_proportional();
+    //     xSpeed = forward_limelight;
 
-        final var sideways_limelight = limmelight_strafe_proportional(false);
-        ySpeed = sideways_limelight;
+    //     final var sideways_limelight = limmelight_strafe_proportional(false);
+    //     ySpeed = sideways_limelight;
 
-        //while using Limelight, turn off field-relative driving.
-        fieldRelative = false;
-    }
+    //     //while using Limelight, turn off field-relative driving.
+    //     fieldRelative = false;
+    // }
     if(m_driverController.getXButton())
     {
         final var rot_limelight = limelight_aim_proportional();
