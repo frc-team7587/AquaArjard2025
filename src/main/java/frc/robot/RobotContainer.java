@@ -29,7 +29,7 @@ import frc.robot.subsystems.CoralIntake.CoralIntakeSparkMax;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorModule;
-import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.Swerve.SwerveDrive;
 import frc.robot.subsystems.Vision.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -182,26 +182,33 @@ public class RobotContainer {
 
     //when top on Dpad is pressed, the level 3 sequence is run
     m_operatorController.povUp().onTrue(L3);
-
+    
+    //when the Y button is held down, the elevator is set to level 2.55 and the coral intake is set to pivot position 5
     m_operatorController.y().onTrue(m_elevator.setElevatorPosition(2.55).alongWith(m_coralIntake.setPivotPosition(5.0).withTimeout(1)));
 
+    //when the A button is held down, the elevator is set to level 0 and the coral intake is set to pivot position 0
     m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
 
+    //when the left bumper is held down, the algae intake motor spins to intake the algae
     m_operatorController.leftBumper().whileTrue(m_algaeIntake.intakeAlgae());
+
+    //when the right bumper is held down, the algae intake motor spins to outtake the algae
     m_operatorController.rightBumper().whileTrue(m_algaeIntake.outtakeAlgae());
 
+    //when the left trigger is held down, the coral intake motor spins to intake the coral
     m_operatorController.leftTrigger().whileTrue(m_coralIntake.intakeCoral());
+
+    //when the right trigger is held down, the coral intake motor spins to outtake the coral
     m_operatorController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
 
+    //when the start button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot downwards
     m_operatorController.start().and(m_operatorController.b()).whileTrue(m_algaeIntake.turntoDown());
+
+    //when the back button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot upwards
     m_operatorController.start().and(m_operatorController.x()).whileTrue(m_algaeIntake.turntoUp());
 
+    //sets the pivot position for intaking the coral from the player position
     m_operatorController.x().onTrue(m_coralIntake.setPivotPosition(4.5));
-
-    
-
-    
-    
   }
 
   /**
