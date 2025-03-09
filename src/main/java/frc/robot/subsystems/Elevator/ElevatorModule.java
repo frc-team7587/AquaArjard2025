@@ -110,7 +110,7 @@ public class ElevatorModule implements ElevatorIO {
 
         leftElevatorMotorController.setReference(
             position, ControlType.kPosition, ClosedLoopSlot.kSlot0, 
-            new ElevatorFeedforward(0.2,1.44,1.5,0.05).calculate(0));
+           ElevatorConstants.kFF);
         // rightElevatorMotorController.setReference(
         //         position, ControlType.kPosition, ClosedLoopSlot.kSlot0, 
         //         new ElevatorFeedforward(0.2,1.44,1.5,0.05).calculate(0));

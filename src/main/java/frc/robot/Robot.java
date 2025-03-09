@@ -251,16 +251,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_drive.moveBackAuto();
 
-    // if (m_autonomousCommand != null) {
-    //   m_autonomousCommand.schedule();
-    // }
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.schedule();
+    }
   }
 
   @Override
   public void autonomousPeriodic() {
-    m_drive.drive(-1,0,0, true, getPeriod);
+    //m_drive.drive(-0.5,0,0, true, getPeriod);
 
   }
 

@@ -32,6 +32,7 @@ import frc.robot.subsystems.Elevator.ElevatorModule;
 import frc.robot.subsystems.Swerve.SwerveDrive;
 import frc.robot.subsystems.Vision.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -43,8 +44,11 @@ import java.util.List;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 
 
@@ -180,7 +184,7 @@ public class RobotContainer {
     m_operatorController.povUp().onTrue(L3);
     
     //when the Y button is held down, the elevator is set to level 2.55 and the coral intake is set to pivot position 5
-    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(2.25).alongWith(m_coralIntake.setPivotPosition(4.35).withTimeout(1)));
+    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(4.1).alongWith(m_coralIntake.setPivotPosition(4.8).withTimeout(1)));
 
     //when the A button is held down, the elevator is set to level 0 and the coral intake is set to pivot position 0
     m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
@@ -251,8 +255,14 @@ public class RobotContainer {
     // This method loads the auto when it is called, however, it is recommended
     // to first load your paths/autos when code starts, then return the
     // pre-loaded auto/path
-    return new PathPlannerAuto("0");
+    try{
+    PathPlannerPath path = PathPlannerPath.fromPathFile("leave 0");
 
+    return AutoBuilder.followPath(path);
+    } catch (Exception e){
+      DriverStation.reportError("error", null);
+      return Commands.none();
+    }
     //sendable chooser
     
 

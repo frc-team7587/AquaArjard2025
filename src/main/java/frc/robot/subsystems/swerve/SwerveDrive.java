@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -26,7 +27,9 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.studica.frc.AHRS;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Robot;
 import frc.robot.subsystems.Vision.LimelightHelpers;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.util.Units;
@@ -94,6 +97,8 @@ public class SwerveDrive extends SubsystemBase {
       // Handle exception as needed
       e.printStackTrace();
     }
+
+    //SmartDashboard.putNumber("Max velocity", config);
 
     PIDConstants translationConstants = new PIDConstants(5.0, 0.0, 0.0);
     PIDConstants rotationConstants = new PIDConstants(5.0, 0.0, 0.0);
@@ -183,24 +188,7 @@ public class SwerveDrive extends SubsystemBase {
 
  } 
 
- /**
-   * Runs the drive at the desired velocity.
-   *
-   * @param speeds Speeds in meters/sec
-   */
-  public void driveRobotRelative(ChassisSpeeds speeds) {
-    // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-    SwerveModuleState[] setpointStates = m_kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.kMaxSpeedMetersPerSecond);
 
-    // Send setpoints to modules
-     // FL, FR, BL, BR
-    m_frontLeft.setDesiredState(setpointStates[0]);
-    m_frontRight.setDesiredState(setpointStates[1]);
-    m_rearLeft.setDesiredState(setpointStates[2]);
-    m_rearRight.setDesiredState(setpointStates[3]);
-  }
 
   /**
      * Returns the rotation of the robot reported by the gyroscope.
@@ -216,6 +204,12 @@ public class SwerveDrive extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+
+  public Command moveBackAuto(){
+    return run(
+    () -> drive(-0.5,0,0, true, Robot.getPeriod)
+    );
   }
 
   /** Resets the current odometry pose. */
@@ -263,7 +257,27 @@ public class SwerveDrive extends SubsystemBase {
         pose);
   }
   
-
+ /**
+   * Runs the drive at the desired velocity.
+   *
+   * @param speeds Speeds in meters/sec
+   */
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    // Calculate module setpoints
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+    SwerveModuleState[] setpointStates = m_kinematics.toSwerveModuleStates(discreteSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    
+    SmartDashboard.putNumber("x-velocity", discreteSpeeds.vxMetersPerSecond);
+    SmartDashboard.putNumber("y-velocity", discreteSpeeds.vyMetersPerSecond);
+    SmartDashboard.putNumber("omega", discreteSpeeds.omegaRadiansPerSecond);
+    // Send setpoints to modules
+     // FL, FR, BL, BR
+    m_frontLeft.setDesiredState(setpointStates[0]);
+    m_frontRight.setDesiredState(setpointStates[1]);
+    m_rearLeft.setDesiredState(setpointStates[2]);
+    m_rearRight.setDesiredState(setpointStates[3]);
+  }
   /**
    * Method to drive the robot using joystick info.
    *
@@ -291,6 +305,7 @@ public class SwerveDrive extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
+
   }
 
   /**
@@ -351,7 +366,8 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    //m_odometry.update(getRotation(),getModulePositions());
+    m_odometry.update(getRotation(),getModulePositions());
+    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
 
         SmartDashboard.putNumber("Gyro angle: ", m_gyro.getAngle()%360);
         
