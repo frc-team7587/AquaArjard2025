@@ -126,8 +126,8 @@ public class Robot extends TimedRobot {
     // }
     if(m_driverController.getXButton())
     {
-        final var rot_limelight = limelight_aim_proportional();
-        rot = rot_limelight;
+        // final var rot_limelight = limelight_aim_proportional();
+        // rot = rot_limelight;
 
         final var forward_limelight = limelight_range_proportional();
         xSpeed = forward_limelight;

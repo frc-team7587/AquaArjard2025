@@ -72,7 +72,7 @@ public class RobotContainer {
   // The operator's controller
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
-  private final SendableChooser<Command> autoChooser;
+  // private final SendableChooser<Command> autoChooser;
   private final Field2d field;
 
   
@@ -81,12 +81,8 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-    // Build an auto chooser. This will use Commands.none() as the default option.
-    autoChooser = AutoBuilder.buildAutoChooser();
+  
 
-    // Another option that allows you to specify the default auto by its name
-    // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
-    SmartDashboard.putData("Auto Chooser", autoChooser);
     //Registering named commands to pathplanner
     NamedCommands.registerCommand("Level 0", m_elevator.elevatorToLevel0());
     NamedCommands.registerCommand("Level 1", m_elevator.elevatorToLevel1());
@@ -162,7 +158,7 @@ public class RobotContainer {
 
     //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L3 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2.7)).withTimeout(1)
+      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2)).withTimeout(1)
       // m_coralIntake.outtakeCoral().withTimeout(1.5),
       // m_elevator.resetElevatorPosition()
     );
@@ -184,7 +180,7 @@ public class RobotContainer {
     m_operatorController.povUp().onTrue(L3);
     
     //when the Y button is held down, the elevator is set to level 2.55 and the coral intake is set to pivot position 5
-    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(2.55).alongWith(m_coralIntake.setPivotPosition(5.0).withTimeout(1)));
+    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(2.25).alongWith(m_coralIntake.setPivotPosition(4.35).withTimeout(1)));
 
     //when the A button is held down, the elevator is set to level 0 and the coral intake is set to pivot position 0
     m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
@@ -255,10 +251,10 @@ public class RobotContainer {
     // This method loads the auto when it is called, however, it is recommended
     // to first load your paths/autos when code starts, then return the
     // pre-loaded auto/path
-    //return new PathPlannerAuto("Example Auto");
+    return new PathPlannerAuto("0");
 
     //sendable chooser
-    return autoChooser.getSelected();
+    
 
     /*/ Create config for trajectory
 
