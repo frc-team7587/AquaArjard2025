@@ -16,8 +16,8 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.CoralIntake.CoralIntake;
 import frc.robot.subsystems.CoralIntake.CoralIntakeIO;
 import frc.robot.subsystems.CoralIntake.CoralIntakeSparkMax;
-import frc.robot.subsystems.Vision.LimelightHelpers;
 import frc.robot.subsystems.Swerve.SwerveDrive;
+import frc.robot.subsystems.Vision.LimelightHelpers;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -251,15 +251,18 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
+    // if (m_autonomousCommand != null) {
+    //   m_autonomousCommand.schedule();
+    // }
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    m_drive.drive(-1,0,0, true, getPeriod);
+
+  }
 
   @Override
   public void autonomousExit() {}
