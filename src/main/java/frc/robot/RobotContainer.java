@@ -62,7 +62,7 @@ public class RobotContainer {
   // The robot's subsystems
   //private final SwerveDrive m_robotDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
-  private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
+  // private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
 
 
@@ -93,12 +93,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("Level 2", m_elevator.elevatorToLevel2());
     NamedCommands.registerCommand("Level 3", m_elevator.elevatorToLevel3());
 
-    NamedCommands.registerCommand("Shoot Coral", m_coralIntake.outtakeCoral());
-    NamedCommands.registerCommand("Intake Coral", m_coralIntake.intakeCoral());
+    //NamedCommands.registerCommand("Shoot Coral", m_coralIntake.outtakeCoral());
+    //NamedCommands.registerCommand("Intake Coral", m_coralIntake.intakeCoral());
 
-    NamedCommands.registerCommand("Turn Coral to Neutral", m_coralIntake.turntoNeutral());
-    NamedCommands.registerCommand("Turn Coral to Up", m_coralIntake.turntoUp());
-    NamedCommands.registerCommand("Turn Coral to Down", m_coralIntake.turntoDown());
+    //NamedCommands.registerCommand("Turn Coral to Neutral", m_coralIntake.turntoNeutral());
+    //NamedCommands.registerCommand("Turn Coral to Up", m_coralIntake.turntoUp());
+    //NamedCommands.registerCommand("Turn Coral to Down", m_coralIntake.turntoDown());
 
     field = new Field2d();
         SmartDashboard.putData("Field", field);
@@ -140,75 +140,75 @@ public class RobotContainer {
     // );
 
     //sequantial command group for level 0 sco(ring, scores the corala and then brings elevator back to 0
-    SequentialCommandGroup L0 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel0().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
-      // m_coralIntake.outtakeCoral().withTimeout(1.5),
-      // m_elevator.resetElevatorPosition()
-    );
+    // SequentialCommandGroup L0 = new SequentialCommandGroup(
+    //   m_elevator.elevatorToLevel0().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+    //   // m_coralIntake.outtakeCoral().withTimeout(1.5),
+    //   // m_elevator.resetElevatorPosition()
+    // );
 
-    //sequantial command group for level 1 scoring, scores the corala and then brings elevator back to 0
-    SequentialCommandGroup L1 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel1().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
-      // m_coralIntake.outtakeCoral().withTimeout(1.5),
-      // m_elevator.resetElevatorPosition()
-    );
+    // //sequantial command group for level 1 scoring, scores the corala and then brings elevator back to 0
+    // SequentialCommandGroup L1 = new SequentialCommandGroup(
+    //   m_elevator.elevatorToLevel1().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+    //   // m_coralIntake.outtakeCoral().withTimeout(1.5),
+    //   // m_elevator.resetElevatorPosition()
+    // );
 
-    //sequantial command group for level 2 scoring, scores the corala and then brings elevator back to 0
-    SequentialCommandGroup L2 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel2().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
-      // m_coralIntake.outtakeCoral().withTimeout(1.5),
-      // m_elevator.resetElevatorPosition()
-    );
+    // //sequantial command group for level 2 scoring, scores the corala and then brings elevator back to 0
+    // SequentialCommandGroup L2 = new SequentialCommandGroup(
+    //   m_elevator.elevatorToLevel2().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+    //   // m_coralIntake.outtakeCoral().withTimeout(1.5),
+    //   // m_elevator.resetElevatorPosition()
+    // );
 
-    //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
-    SequentialCommandGroup L3 = new SequentialCommandGroup(
-      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2)).withTimeout(1)
-      // m_coralIntake.outtakeCoral().withTimeout(1.5),
-      // m_elevator.resetElevatorPosition()
-    );
+    // //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
+    // SequentialCommandGroup L3 = new SequentialCommandGroup(
+    //   m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2)).withTimeout(1)
+    //   // m_coralIntake.outtakeCoral().withTimeout(1.5),
+    //   // m_elevator.resetElevatorPosition()
+    // );
 
   
 
     //OPERATOR CONTROLS
 
-    //when bottom on Dpad is pressed, the level 0 sequence is run
-    m_operatorController.povDown().onTrue(L0);
+    // //when bottom on Dpad is pressed, the level 0 sequence is run
+    // m_operatorController.povDown().onTrue(L0);
 
-    //when left on Dpad is pressed, the level 1 sequence is run
-    m_operatorController.povLeft().onTrue(L1);
+    // //when left on Dpad is pressed, the level 1 sequence is run
+    // m_operatorController.povLeft().onTrue(L1);
 
-    //when right on Dpad is pressed, the level 2 sequence is run
-    m_operatorController.povRight().onTrue(L2);
+    // //when right on Dpad is pressed, the level 2 sequence is run
+    // m_operatorController.povRight().onTrue(L2);
 
-    //when top on Dpad is pressed, the level 3 sequence is run
-    m_operatorController.povUp().onTrue(L3);
+    // //when top on Dpad is pressed, the level 3 sequence is run
+    // m_operatorController.povUp().onTrue(L3);
     
-    //when the Y button is held down, the elevator is set to level 2.55 and the coral intake is set to pivot position 5
-    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(4.1).alongWith(m_coralIntake.setPivotPosition(4.8).withTimeout(1)));
+    // //when the Y button is held down, the elevator is set to level 2.55 and the coral intake is set to pivot position 5
+    // m_operatorController.y().onTrue(m_elevator.setElevatorPosition(4.1).alongWith(m_coralIntake.setPivotPosition(4.8).withTimeout(1)));
 
-    //when the A button is held down, the elevator is set to level 0 and the coral intake is set to pivot position 0
-    m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
+    // //when the A button is held down, the elevator is set to level 0 and the coral intake is set to pivot position 0
+    // m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
 
-    //when the left bumper is held down, the algae intake motor spins to intake the algae
-    m_operatorController.leftBumper().whileTrue(m_algaeIntake.intakeAlgae());
+    // //when the left bumper is held down, the algae intake motor spins to intake the algae
+    // m_operatorController.leftBumper().whileTrue(m_algaeIntake.intakeAlgae());
 
-    //when the right bumper is held down, the algae intake motor spins to outtake the algae
-    m_operatorController.rightBumper().whileTrue(m_algaeIntake.outtakeAlgae());
+    // //when the right bumper is held down, the algae intake motor spins to outtake the algae
+    // m_operatorController.rightBumper().whileTrue(m_algaeIntake.outtakeAlgae());
 
-    //when the left trigger is held down, the coral intake motor spins to intake the coral
-    m_operatorController.leftTrigger().whileTrue(m_coralIntake.intakeCoral());
+    // //when the left trigger is held down, the coral intake motor spins to intake the coral
+    // m_operatorController.leftTrigger().whileTrue(m_coralIntake.intakeCoral());
 
-    //when the right trigger is held down, the coral intake motor spins to outtake the coral
-    m_operatorController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
+    // //when the right trigger is held down, the coral intake motor spins to outtake the coral
+    // m_operatorController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
 
-    //when the start button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot downwards
-    m_operatorController.start().and(m_operatorController.b()).whileTrue(m_algaeIntake.turntoDown());
+    // //when the start button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot downwards
+    // m_operatorController.start().and(m_operatorController.b()).whileTrue(m_algaeIntake.turntoDown());
 
-    //when the back button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot upwards
-    m_operatorController.start().and(m_operatorController.x()).whileTrue(m_algaeIntake.turntoUp());
+    // //when the back button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot upwards
+    // m_operatorController.start().and(m_operatorController.x()).whileTrue(m_algaeIntake.turntoUp());
 
-    //sets the pivot position for intaking the coral from the player position
-    m_operatorController.x().onTrue(m_coralIntake.setPivotPosition(4.5));
+    // //sets the pivot position for intaking the coral from the player position
+    // m_operatorController.x().onTrue(m_coralIntake.setPivotPosition(4.5));
   }
 
   /**
