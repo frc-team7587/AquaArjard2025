@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Swerve;
+package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.ControlType.*;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -21,10 +22,12 @@ import java.lang.reflect.Type;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import org.littletonrobotics.junction.Logger;
 
 import frc.robot.Configs;
+import frc.robot.subsystems.swerve.SwerveDriveIO.SwerveDriveIOInputs;
 
-public class SwerveModule {
+public class SwerveModule implements SwerveDriveIO {
   private final SparkMax m_drivingSpark;
   private final SparkMax m_turningSpark;
 
@@ -36,6 +39,8 @@ public class SwerveModule {
 
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
+
+
 
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -116,4 +121,102 @@ public class SwerveModule {
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
   }
+
+  @Override
+  public double getDrivingPosition() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getDrivingPosition'");
+  }
+
+  @Override
+  public double getTurningPosition() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getTurningPosition'");
+  }
+
+  @Override
+  public double getDrivingVelocity() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getDrivingVelocity'");
+  }
+
+  @Override
+  public double getTurningVelocity() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getTurningVelocity'");
+  }
+
+  @Override
+  public void resetEncoder() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'resetEncoder'");
+  }
+
+  @Override
+  public void updateInputs(SwerveDriveIOInputs inputs) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
+  }
+
+  @Override
+  public void setDriveVoltage(double volts) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setDriveVoltage'");
+  }
+
+  @Override
+  public void setTurnVoltage(double volts) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setTurnVoltage'");
+  }
+
+  @Override
+  public void setDriveVelocity(double velocityRadPerSec) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setDriveVelocity'");
+  }
+
+  @Override
+  public void setTurnPosition(double angle) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setTurnPosition'");
+  }
+
+  @Override
+  public void setDrivePIDFF(double p, double i, double d, double ff) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setDrivePIDFF'");
+  }
+
+  @Override
+  public void setTurnPIDFF(double p, double i, double d, double ff) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setTurnPIDFF'");
+  }
+
+  @Override
+  public double getTurnPositionError(double angle) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getTurnPositionError'");
+  }
+
+@Override
+  public void setDriveBrakeMode(boolean enable) {
+    Configs.MAXSwerveModule.drivingConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+    m_drivingSpark.configure(
+      Configs.MAXSwerveModule.drivingConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  @Override
+  public void setTurnBrakeMode(boolean enable) {
+    Configs.MAXSwerveModule.turningConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+    m_turningSpark.configure(
+      Configs.MAXSwerveModule.turningConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+public Rotation2d getAngle() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getAngle'");
+}
+
 }

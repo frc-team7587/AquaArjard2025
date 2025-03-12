@@ -4,10 +4,13 @@
 
 package frc.robot;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -22,6 +25,60 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+  public static final Mode mode = Mode.SIM;
+  public static final Drivers driver = Drivers.BEN;
+  public static final Operators operator = Operators.JEROME;
+
+  public static final Mode currentMode = getRobotMode();
+
+  public static final boolean useVision = (currentMode == Mode.SIM ? true : true);
+
+  public static enum Mode {
+    /** Running on a real robot. */
+    REAL,
+
+    /** Running a physics simulator. */
+    SIM,
+
+    /* Test bot */
+    TEST,
+
+    /** Replaying from a log file. */
+    REPLAY
+  }
+
+  public static enum Drivers {
+    PROGRAMMERS,
+    BEN,
+    BILLY,
+    JEROME
+  }
+
+  public static enum Operators {
+    PROGRAMMERS,
+    JEROME,
+    BILLY
+  }
+
+  public static Mode getRobotMode() {
+    if (RobotBase.isReal()) {
+      return Mode.REAL;
+    }
+    if (RobotBase.isSimulation()) {
+      switch (mode) {
+        case REAL:
+          System.out.println("WARNING: Running in real mode while in simulation");
+        case SIM:
+          return Mode.SIM;
+        case TEST:
+          return Mode.TEST;
+        case REPLAY:
+          return Mode.REPLAY;
+      }
+    }
+    return Mode.REAL;
+  }
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
@@ -74,6 +131,23 @@ public final class Constants {
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
     public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
+
+
+        public static final double kDrivingP = 0.04;
+        public static final double kDrivingI = 0;
+        public static final double kDrivingD = 0;
+        public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
+        public static final double kDrivingMinOutput = -1;
+        public static final double kDrivingMaxOutput = 1;
+      
+        // Turning PID will have to be changed for robot relative, use sysid one day
+        public static final double kTurningP = 1;
+        public static final double kTurningI = 0;
+        public static final double kTurningD = 0;
+        public static final double kTurningFF = 0;
+        public static final double kTurningMinOutput = -1;
+        public static final double kTurningMaxOutput = 1;
+      
   }
 
   public static final class OIConstants {
