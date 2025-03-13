@@ -8,6 +8,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeConstants;
+import frc.robot.subsystems.Climber.ClimberConstants;
 import frc.robot.subsystems.CoralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
 
@@ -117,6 +118,25 @@ public final class Configs {
                 .reverseSoftLimit((float)CoralIntakeConstants.kPivotMinPosition);
         intakeConfig
                 .idleMode(IdleMode.kBrake);
+        }
+    }
+
+    public static final class ClimberConfig{
+        public static final SparkMaxConfig climberConfig = new SparkMaxConfig();
+        public static final SoftLimitConfig climberSoftLimit = new SoftLimitConfig();
+
+        static{
+        climberConfig
+                .idleMode(IdleMode.kBrake);
+        climberConfig.closedLoop
+                .pid(ClimberConstants.kP, ClimberConstants.kI, ClimberConstants.kD)
+                .velocityFF(ClimberConstants.kFF)
+                .outputRange(ClimberConstants.kMinOutput, ClimberConstants.kMaxOutput);
+        climberSoftLimit
+                .forwardSoftLimitEnabled(true)
+                .forwardSoftLimit((float)ClimberConstants.kClimberMaxPosition)
+                .reverseSoftLimitEnabled(true)
+                .reverseSoftLimit((float)ClimberConstants.kClimberMinPosition);
         }
     }
 }
