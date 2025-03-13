@@ -24,6 +24,8 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSparkMax;
+import frc.robot.subsystems.Climber.Climber;
+import frc.robot.subsystems.Climber.ClimberSparkMax;
 import frc.robot.subsystems.CoralIntake.CoralIntake;
 import frc.robot.subsystems.CoralIntake.CoralIntakeSparkMax;
 import frc.robot.subsystems.Elevator.Elevator;
@@ -64,7 +66,7 @@ public class RobotContainer {
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
   private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
-
+  private final Climber m_climber = new Climber(new ClimberSparkMax());
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
@@ -183,7 +185,7 @@ public class RobotContainer {
     //when top on Dpad is pressed, the level 3 sequence is run
     m_operatorController.povUp().onTrue(L3);
     
-    //when the Y button is held down, the elevator is set to level 2.55 and the coral intake is set to pivot position 5
+    //when the Y button is held down, sets the robot into a position to intake the coral
     m_operatorController.y().onTrue(m_elevator.setElevatorPosition(4.1).alongWith(m_coralIntake.setPivotPosition(4.8).withTimeout(1)));
 
     //when the A button is held down, the elevator is set to level 0 and the coral intake is set to pivot position 0
@@ -201,14 +203,23 @@ public class RobotContainer {
     //when the right trigger is held down, the coral intake motor spins to outtake the coral
     m_operatorController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
 
-    //when the start button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot downwards
+    //when the start button (button with the 3 lines) is held down, the coral pivot motor spins to move the algae pivot downwards
     m_operatorController.start().and(m_operatorController.b()).whileTrue(m_algaeIntake.turntoDown());
 
-    //when the back button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot upwards
+    //when the back button (button with the 3 lines) is held down, the coral pivot motor spins to move the algae pivot upwards
     m_operatorController.start().and(m_operatorController.x()).whileTrue(m_algaeIntake.turntoUp());
 
-    //sets the pivot position for intaking the coral from the player position
-    m_operatorController.x().onTrue(m_coralIntake.setPivotPosition(4.5));
+    //when the start button (button with the 3 lines) is held down, the coral pivot motor spins to move the coral pivot downwards
+    m_operatorController.start().and(m_operatorController.a()).whileTrue(m_coralIntake.turntoDown());
+
+    //when the back button (button with the 3 lines) is held down, the coral pivot motor spins to move the coral pivot upwards
+    m_operatorController.start().and(m_operatorController.y()).whileTrue(m_coralIntake.turntoUp());
+
+    //when the b button is pressed, the climber motor spins to make the robot climb on the chain
+    m_operatorController.b().onTrue(m_climber.hangOnChain());
+
+    //when the x button is pressed, the climber motor spins to make the robot get off the chain
+    m_operatorController.x().onTrue(m_climber.getOffChain());
   }
 
   /**
