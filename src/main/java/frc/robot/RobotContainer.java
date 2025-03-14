@@ -29,20 +29,22 @@ import frc.robot.subsystems.Climber.Climber;
 import frc.robot.subsystems.Climber.ClimberSparkMax;
 import frc.robot.subsystems.CoralIntake.CoralIntake;
 import frc.robot.subsystems.CoralIntake.CoralIntakeSparkMax;
+import frc.robot.subsystems.Drive.Drive;
+import frc.robot.subsystems.Drive.GyroIO;
+import frc.robot.subsystems.Drive.GyroIONavX;
+import frc.robot.subsystems.Drive.ModuleIO;
+import frc.robot.subsystems.Drive.ModuleIOSim;
+import frc.robot.subsystems.Drive.ModuleIOSpark;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorModule;
-import frc.robot.subsystems.Swerve.SwerveDrive;
+import frc.robot.subsystems.Marquee.MarqueeMessage;
+import frc.robot.subsystems.Marquee.MarqueeMessageBuilder;
+import frc.robot.subsystems.Marquee.MarqueeSubsystem;
 import frc.robot.subsystems.Vision.LimelightHelpers;
 import frc.robot.subsystems.Vision.VisionIO;
 import frc.robot.subsystems.Vision.VisionIOPhoton;
 import frc.robot.subsystems.Vision.VisionIOSim;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIONavX;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSpark;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -53,6 +55,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -64,6 +68,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 
@@ -76,11 +81,13 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final Drive drive;
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
   private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
   private final Climber m_climber = new Climber(new ClimberSparkMax());
+
+  private final MarqueeSubsystem m_MarqueeSubsystem;
+  private final Drive drive;
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
@@ -98,11 +105,102 @@ public class RobotContainer {
   // private final SendableChooser<Command> autoChooser;
   private final Field2d field;
 
-  
+  /**
+   * Messages to display on the marquee.
+   */
+  private static final ArrayList<MarqueeMessage> kMessagesToDisplay;
+
+  static {
+    kMessagesToDisplay = new ArrayList<>();
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+          "Metuchen Momentum", 20000)
+        .setForegroundGreen(63)
+        .setForegroundRed(63)
+        .setDelay1(40)
+        .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+          "Off the wall!", 20000)
+        .setBackgroundRed(31)
+        .setForegroundGreen(63)
+        .setDelay1(40)
+        .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+          "Green Alliance", 20000)
+        .setForegroundGreen(127)
+        .setDelay1(40)
+        .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+          "Thank you, sponsors ...", 20000)
+        .setForegroundRed(42)
+        .setForegroundGreen(42)
+        .setForegroundBlue(42)
+        .setDelay1(40)
+        .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+        "Boyd, Dewey, Cheetham, and How, Attournies At Law", 20000)
+      .setForegroundBlue(127)
+      .setDelay1(40)
+      .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+        "Pickup Andropov Car Service", 20000)
+      .setForegroundRed(127)
+      .setDelay1(40)
+      .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+        "Rolls, Canardly Fine Classic Automobiles", 20000)
+      .setForegroundBlue(127)
+      .setDelay1(40)
+      .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+        "Orson Buggy Logistics", 20000)
+      .setForegroundRed(63)
+      .setForegroundBlue(63)
+      .setDelay1(40)
+      .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+        "Dustin Dubree Construction", 20000)
+      .setForegroundRed(63)
+      .setForegroundGreen(63)
+      .setDelay1(40)
+      .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+        "Horseshoe Road Inn, Guest Accommodations", 20000)
+      .setForegroundGreen(63)
+      .setForegroundBlue(63)
+      .setDelay1(40)
+      .build());
+    kMessagesToDisplay.add(
+      new MarqueeMessageBuilder(
+        "Puns (Dis)Courtesy of Cartalk.Com", 20000)
+      .setForegroundBlue(127)
+      .setDelay1(40)
+      .build());
+  }
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    //redirect console output to the log
+    DataLogManager.log(new StringBuilder("Robot is starting. at ")
+      .append(Instant.now())
+      .append('.')
+      .toString());
+
+    System.out.println("Creating the marquee subsystem.");
+    m_MarqueeSubsystem = MarqueeSubsystem.usbConnection(kMessagesToDisplay, 20);
+    System.out.println("Marquee subsystem created");
+
     //Registering named commands to pathplanner
     NamedCommands.registerCommand("Level 0", m_elevator.elevatorToLevel0());
     NamedCommands.registerCommand("Level 1", m_elevator.elevatorToLevel1());
@@ -201,9 +299,7 @@ public class RobotContainer {
       m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2)).withTimeout(1)
       // m_coralIntake.outtakeCoral().withTimeout(1.5),
       // m_elevator.resetElevatorPosition()
-    );
-
-  
+    );  
 
     //OPERATOR CONTROLS
 

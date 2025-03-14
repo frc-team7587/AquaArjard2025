@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,7 +17,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.CoralIntake.CoralIntake;
 import frc.robot.subsystems.CoralIntake.CoralIntakeIO;
 import frc.robot.subsystems.CoralIntake.CoralIntakeSparkMax;
-import frc.robot.subsystems.Swerve.SwerveDrive;
+import frc.robot.subsystems.Drive.Drive;
 import frc.robot.subsystems.Vision.LimelightHelpers;
 
 public class Robot extends TimedRobot {
@@ -24,7 +25,6 @@ public class Robot extends TimedRobot {
   public static double getPeriod;
 
   private final RobotContainer m_robotContainer;
-  private final SwerveDrive m_drive = new SwerveDrive();
   private final XboxController m_driverController = new XboxController(0);
   
     // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-
+    DataLogManager.start();
   }
 
    // simple proportional turning control with Limelight.
@@ -139,7 +139,7 @@ public class Robot extends TimedRobot {
         fieldRelative = false;
     }
 
-    m_drive.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
+    //m_drive.drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
   }
 
 /* 
