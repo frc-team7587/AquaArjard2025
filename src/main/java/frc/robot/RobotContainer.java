@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSparkMax;
 import frc.robot.subsystems.CoralIntake.CoralIntake;
@@ -30,7 +31,16 @@ import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorModule;
 import frc.robot.subsystems.Vision.LimelightHelpers;
-import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.Vision.VisionIO;
+import frc.robot.subsystems.Vision.VisionIOPhoton;
+import frc.robot.subsystems.Vision.VisionIOSim;
+import frc.robot.subsystems.swerve.Drive;
+import frc.robot.subsystems.swerve.GyroIO;
+import frc.robot.subsystems.swerve.GyroIONavX;
+import frc.robot.subsystems.swerve.ModuleIO;
+import frc.robot.subsystems.swerve.ModuleIOSim;
+import frc.robot.subsystems.swerve.ModuleIOSpark;
+import frc.robot.subsystems.swerve.Drive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -39,7 +49,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
 import java.util.List;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -59,12 +73,14 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems
-  //private final SwerveDrive m_robotDrive = new SwerveDrive();
+  // Subsystems
+  private final Drive drive;
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
-  // private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
+  private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
 
+  // Dashboard inputs
+  private final LoggedDashboardChooser<Command> autoChooser;
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
@@ -73,142 +89,159 @@ public class RobotContainer {
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+
   // The operator's controller
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
-
-  // private final SendableChooser<Command> autoChooser;
-  private final Field2d field;
-
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIONavX(),
+                new ModuleIOSpark(0),
+                new ModuleIOSpark(1),
+                new ModuleIOSpark(2),
+                new ModuleIOSpark(3),
+                new VisionIOPhoton());
+        break;
 
-  
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new VisionIOSim());
+        break;
 
-    //Registering named commands to pathplanner
-    NamedCommands.registerCommand("Level 0", m_elevator.elevatorToLevel0());
-    NamedCommands.registerCommand("Level 1", m_elevator.elevatorToLevel1());
-    NamedCommands.registerCommand("Level 2", m_elevator.elevatorToLevel2());
-    NamedCommands.registerCommand("Level 3", m_elevator.elevatorToLevel3());
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new VisionIO() {});
+        break;
+    }
+  // Set up auto routines
+  autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    //NamedCommands.registerCommand("Shoot Coral", m_coralIntake.outtakeCoral());
-    //NamedCommands.registerCommand("Intake Coral", m_coralIntake.intakeCoral());
+  // Set up SysId routines
+  autoChooser.addOption(
+      "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+  autoChooser.addOption(
+      "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+  autoChooser.addOption(
+      "Drive SysId (Quasistatic Forward)",
+      drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+  autoChooser.addOption(
+      "Drive SysId (Quasistatic Reverse)",
+      drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+  autoChooser.addOption(
+      "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+  autoChooser.addOption(
+      "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    //NamedCommands.registerCommand("Turn Coral to Neutral", m_coralIntake.turntoNeutral());
-    //NamedCommands.registerCommand("Turn Coral to Up", m_coralIntake.turntoUp());
-    //NamedCommands.registerCommand("Turn Coral to Down", m_coralIntake.turntoDown());
+  // Configure the button bindings
+  configureButtonBindings();
 
-    field = new Field2d();
-        SmartDashboard.putData("Field", field);
+  //Registering named commands to pathplanner
+  NamedCommands.registerCommand("Level 0", m_elevator.elevatorToLevel0());
+  NamedCommands.registerCommand("Level 1", m_elevator.elevatorToLevel1());
+  NamedCommands.registerCommand("Level 2", m_elevator.elevatorToLevel2());
+  NamedCommands.registerCommand("Level 3", m_elevator.elevatorToLevel3());
 
-        // Logging callback for current robot pose
-        PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
-            // Do whatever you want with the pose here
-            field.setRobotPose(pose);
-        });
+  //NamedCommands.registerCommand("Shoot Coral", m_coralIntake.outtakeCoral());
+  //NamedCommands.registerCommand("Intake Coral", m_coralIntake.intakeCoral());
 
-        // Logging callback for target robot pose
-        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-            // Do whatever you want with the pose here
-            field.getObject("target pose").setPose(pose);
-        });
-
-        // Logging callback for the active path, this is sent as a list of poses
-        PathPlannerLogging.setLogActivePathCallback((poses) -> {
-            // Do whatever you want with the poses here
-            field.getObject("path").setPoses(poses);
-        });
-
+  //NamedCommands.registerCommand("Turn Coral to Neutral", m_coralIntake.turntoNeutral());
+  //NamedCommands.registerCommand("Turn Coral to Up", m_coralIntake.turntoUp());
+  //NamedCommands.registerCommand("Turn Coral to Down", m_coralIntake.turntoDown());
 
     // Configure the button bindings
     configureButtonBindings();
 
-    
-    // m_robotDrive.setDefaultCommand(
-    //      // The left stick controls translation of the robot.
-    //      // Turning is controlled by the X axis of the right stick.
-    //      new RunCommand(
-    //          () -> m_robotDrive.drive(
-    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-    //              -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
-    //              true, Robot.getPeriod),
-    //         m_robotDrive
-    //     )
-    // );
+    // sequantial command group for level 0 sco(ring, scores the corala and then brings elevator back to 0
+    SequentialCommandGroup L0 = new SequentialCommandGroup(
+      m_elevator.elevatorToLevel0().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+      // m_coralIntake.outtakeCoral().withTimeout(1.5),
+      // m_elevator.resetElevatorPosition()
+    );
 
-    //sequantial command group for level 0 sco(ring, scores the corala and then brings elevator back to 0
-    // SequentialCommandGroup L0 = new SequentialCommandGroup(
-    //   m_elevator.elevatorToLevel0().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
-    //   // m_coralIntake.outtakeCoral().withTimeout(1.5),
-    //   // m_elevator.resetElevatorPosition()
-    // );
+    //sequantial command group for level 1 scoring, scores the corala and then brings elevator back to 0
+    SequentialCommandGroup L1 = new SequentialCommandGroup(
+      m_elevator.elevatorToLevel1().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+      // m_coralIntake.outtakeCoral().withTimeout(1.5),
+      // m_elevator.resetElevatorPosition()
+    );
 
-    // //sequantial command group for level 1 scoring, scores the corala and then brings elevator back to 0
-    // SequentialCommandGroup L1 = new SequentialCommandGroup(
-    //   m_elevator.elevatorToLevel1().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
-    //   // m_coralIntake.outtakeCoral().withTimeout(1.5),
-    //   // m_elevator.resetElevatorPosition()
-    // );
+    //sequantial command group for level 2 scoring, scores the corala and then brings elevator back to 0
+    SequentialCommandGroup L2 = new SequentialCommandGroup(
+      m_elevator.elevatorToLevel2().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
+      // m_coralIntake.outtakeCoral().withTimeout(1.5),
+      // m_elevator.resetElevatorPosition()
+    );
 
-    // //sequantial command group for level 2 scoring, scores the corala and then brings elevator back to 0
-    // SequentialCommandGroup L2 = new SequentialCommandGroup(
-    //   m_elevator.elevatorToLevel2().alongWith(m_coralIntake.turntoNeutral()).withTimeout(1)
-    //   // m_coralIntake.outtakeCoral().withTimeout(1.5),
-    //   // m_elevator.resetElevatorPosition()
-    // );
-
-    // //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
-    // SequentialCommandGroup L3 = new SequentialCommandGroup(
-    //   m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(2)).withTimeout(1)
-    //   // m_coralIntake.outtakeCoral().withTimeout(1.5),
-    //   // m_elevator.resetElevatorPosition()
-    // );
+    //sequantial command group for level 3 scoring, scores the corala and then brings elevator back to 0
+    SequentialCommandGroup L3 = new SequentialCommandGroup(
+      m_elevator.elevatorToLevel3().alongWith(m_coralIntake.setPivotPosition(3.2)).withTimeout(1)
+      // m_coralIntake.outtakeCoral().withTimeout(1.5),
+      // m_elevator.resetElevatorPosition()
+    );
 
   
 
     //OPERATOR CONTROLS
 
-    // //when bottom on Dpad is pressed, the level 0 sequence is run
-    // m_operatorController.povDown().onTrue(L0);
+    //when bottom on Dpad is pressed, the level 0 sequence is run
+    m_operatorController.povDown().onTrue(L0);
+ 
+    //when left on Dpad is pressed, the level 1 sequence is run
+    m_operatorController.povLeft().onTrue(L1);
 
-    // //when left on Dpad is pressed, the level 1 sequence is run
-    // m_operatorController.povLeft().onTrue(L1);
+    //when right on Dpad is pressed, the level 2 sequence is run
+    m_operatorController.povRight().onTrue(L2);
 
-    // //when right on Dpad is pressed, the level 2 sequence is run
-    // m_operatorController.povRight().onTrue(L2);
-
-    // //when top on Dpad is pressed, the level 3 sequence is run
-    // m_operatorController.povUp().onTrue(L3);
+    //when top on Dpad is pressed, the level 3 sequence is run
+    m_operatorController.povUp().onTrue(L3);
     
-    // //when the Y button is held down, the elevator is set to level 2.55 and the coral intake is set to pivot position 5
-    // m_operatorController.y().onTrue(m_elevator.setElevatorPosition(4.1).alongWith(m_coralIntake.setPivotPosition(4.8).withTimeout(1)));
+    //when the Y button is held down, the elevator is set to level 2.55 and the coral intake is set to pivot position 5
+    m_operatorController.y().onTrue(m_elevator.setElevatorPosition(4.1).alongWith(m_coralIntake.setPivotPosition(5.35).withTimeout(1)));
 
-    // //when the A button is held down, the elevator is set to level 0 and the coral intake is set to pivot position 0
-    // m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
+    //when the A button is held down, the elevator is set to level 0 and the coral intake is set to pivot position 0
+    m_operatorController.a().onTrue(m_elevator.setElevatorPosition(ElevatorConstants.kElevatorLevel2+0.5).alongWith(m_coralIntake.turntoNeutral()).alongWith(m_algaeIntake.turntoNeutral()));
 
-    // //when the left bumper is held down, the algae intake motor spins to intake the algae
-    // m_operatorController.leftBumper().whileTrue(m_algaeIntake.intakeAlgae());
+    //when the left bumper is held down, the algae intake motor spins to intake the algae
+    m_operatorController.leftBumper().whileTrue(m_algaeIntake.intakeAlgae());
 
-    // //when the right bumper is held down, the algae intake motor spins to outtake the algae
-    // m_operatorController.rightBumper().whileTrue(m_algaeIntake.outtakeAlgae());
+    //when the right bumper is held down, the algae intake motor spins to outtake the algae
+    m_operatorController.rightBumper().whileTrue(m_algaeIntake.outtakeAlgae());
 
-    // //when the left trigger is held down, the coral intake motor spins to intake the coral
-    // m_operatorController.leftTrigger().whileTrue(m_coralIntake.intakeCoral());
+    //when the left trigger is held down, the coral intake motor spins to intake the coral
+    m_operatorController.leftTrigger().whileTrue(m_coralIntake.intakeCoral());
 
-    // //when the right trigger is held down, the coral intake motor spins to outtake the coral
-    // m_operatorController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
+    //when the right trigger is held down, the coral intake motor spins to outtake the coral
+    m_operatorController.rightTrigger().whileTrue(m_coralIntake.outtakeCoral());
 
-    // //when the start button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot downwards
-    // m_operatorController.start().and(m_operatorController.b()).whileTrue(m_algaeIntake.turntoDown());
+    //when the start button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot downwards
+    m_operatorController.start().and(m_operatorController.b()).whileTrue(m_algaeIntake.turntoDown());
 
-    // //when the back button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot upwards
-    // m_operatorController.start().and(m_operatorController.x()).whileTrue(m_algaeIntake.turntoUp());
+    //when the back button (button with the 3 lines) is held down, the coral pivot motor spins to move the pivot upwards
+    m_operatorController.start().and(m_operatorController.x()).whileTrue(m_algaeIntake.turntoUp());
 
-    // //sets the pivot position for intaking the coral from the player position
-    // m_operatorController.x().onTrue(m_coralIntake.setPivotPosition(4.5));
+   // sets the pivot position for intaking the coral from the player position
+    m_operatorController.x().onTrue(m_coralIntake.setPivotPosition(4.5));
   }
 
   /**
@@ -221,7 +254,37 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    
+     // Default command, normal field-relative drive
+     drive.setDefaultCommand(
+      DriveCommands.joystickDrive(
+          drive,
+          () -> -m_driverController.getLeftY(),
+          () -> -m_driverController.getLeftX(),
+          () -> -m_driverController.getRightX()));
+
+  // // Lock to 0° when A button is held
+  // controller
+  //     .a()
+  //     .whileTrue(
+  //         DriveCommands.joystickDriveAtAngle(
+  //             drive,
+  //             () -> -controller.getLeftY(),
+  //             () -> -controller.getLeftX(),
+  //             () -> new Rotation2d()));
+
+  // // Switch to X pattern when X button is pressed
+  // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+  // // Reset gyro to 0° when B button is pressed
+  // controller
+  //     .b()
+  //     .onTrue(
+  //         Commands.runOnce(
+  //                 () ->
+  //                     drive.setPose(
+  //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+  //                 drive)
+  //             .ignoringDisable(true));
   }
 
   double limelight_aim_proportional()
@@ -252,64 +315,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // This method loads the auto when it is called, however, it is recommended
-    // to first load your paths/autos when code starts, then return the
-    // pre-loaded auto/path
-    try{
-    PathPlannerPath path = PathPlannerPath.fromPathFile("leave 0");
-
-    return AutoBuilder.followPath(path);
-    } catch (Exception e){
-      DriverStation.reportError("error", null);
-      return Commands.none();
-    }
-    //sendable chooser
-    
-
-    /*/ Create config for trajectory
-
-
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
-
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        config);
-
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
-
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        m_robotDrive::setModuleStates,
-        m_robotDrive);
-
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
-    */
-
-    
-
+    return autoChooser.get();
   }
   
   public void autonomousPeriodic() {

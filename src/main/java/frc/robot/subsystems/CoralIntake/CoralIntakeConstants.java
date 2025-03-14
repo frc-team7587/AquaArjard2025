@@ -10,7 +10,7 @@ public class CoralIntakeConstants {
     public static final int kPivotMotorID = 14;
 
     public static final double kPivotMaxPosition = 4.5;
-    public static final double kPivotNeutalPosition = 2.7;
+    public static final double kPivotNeutalPosition = 3.7;
     public static final double kPivotMinPosition = 0.0;
 
     public static final double kP = 0.1;
