@@ -48,7 +48,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.*;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.Vision.VisionIO;
-import frc.robot.subsystems.Vision.VisionIOInputsAutoLogged;
+
 import frc.robot.util.LocalADStarAK;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -59,7 +59,8 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends SubsystemBase {
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
-  private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  private final GYroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
