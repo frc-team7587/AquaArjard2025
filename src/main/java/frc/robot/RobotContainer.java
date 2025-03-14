@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.AlgaeIntakeSparkMax;
 import frc.robot.subsystems.Climber.Climber;
@@ -33,6 +34,15 @@ import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorModule;
 import frc.robot.subsystems.Swerve.SwerveDrive;
 import frc.robot.subsystems.Vision.LimelightHelpers;
+import frc.robot.subsystems.Vision.VisionIO;
+import frc.robot.subsystems.Vision.VisionIOPhoton;
+import frc.robot.subsystems.Vision.VisionIOSim;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIONavX;
+import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOSpark;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -41,7 +51,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
 import java.util.List;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -62,7 +76,7 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
  */
 public class RobotContainer {
   // The robot's subsystems
-  //private final SwerveDrive m_robotDrive = new SwerveDrive();
+  private final Drive drive;
   private final Elevator m_elevator = new Elevator(new ElevatorModule());
   private final CoralIntake m_coralIntake = new CoralIntake(new CoralIntakeSparkMax());
   private final AlgaeIntake m_algaeIntake = new AlgaeIntake(new AlgaeIntakeSparkMax());
@@ -78,6 +92,9 @@ public class RobotContainer {
   // The operator's controller
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
+  // Dashboard inputs
+  private final LoggedDashboardChooser<Command> autoChooser;
+
   // private final SendableChooser<Command> autoChooser;
   private final Field2d field;
 
@@ -86,9 +103,6 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-
-  
-
     //Registering named commands to pathplanner
     NamedCommands.registerCommand("Level 0", m_elevator.elevatorToLevel0());
     NamedCommands.registerCommand("Level 1", m_elevator.elevatorToLevel1());
@@ -123,23 +137,43 @@ public class RobotContainer {
             field.getObject("path").setPoses(poses);
         });
 
+    switch (Constants.currentMode) {
+      // Real robot, instantiate hardware IO implementations
+      case REAL:
+        drive =
+          new Drive(
+            new GyroIONavX(),
+            new ModuleIOSpark(0),
+            new ModuleIOSpark(1),
+            new ModuleIOSpark(2),
+            new ModuleIOSpark(3),
+            new VisionIOPhoton());
+        break;
 
-    // Configure the button bindings
-    configureButtonBindings();
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+          new Drive(
+            new GyroIO() {},
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new VisionIOSim());
+        break;
 
-    
-    // m_robotDrive.setDefaultCommand(
-    //      // The left stick controls translation of the robot.
-    //      // Turning is controlled by the X axis of the right stick.
-    //      new RunCommand(
-    //          () -> m_robotDrive.drive(
-    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-    //              -MathUtil.applyDeadband((1 - 0.75 * m_driverController.getRightTriggerAxis()) * m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-    //              -MathUtil.applyDeadband(0.5 * m_driverController.getRightX(), OIConstants.kDriveDeadband),
-    //              true, Robot.getPeriod),
-    //         m_robotDrive
-    //     )
-    // );
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+          new Drive(
+            new GyroIO() {},
+            new ModuleIO() {},
+            new ModuleIO() {},
+            new ModuleIO() {},
+            new ModuleIO() {},
+            new VisionIO() {});
+        break;
+    }
 
     //sequantial command group for level 0 sco(ring, scores the corala and then brings elevator back to 0
     SequentialCommandGroup L0 = new SequentialCommandGroup(
@@ -220,6 +254,28 @@ public class RobotContainer {
 
     //when the x button is pressed, the climber motor spins to make the robot get off the chain
     m_operatorController.x().onTrue(m_climber.getOffChain());
+
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    // Configure the button bindings
+    configureButtonBindings();
   }
 
   /**
